@@ -1,0 +1,59 @@
+{
+  "name": "douyu-cli",
+  "version": "0.3.0",
+  "description": "斗鱼视频下载CLI",
+  "homepage": "",
+  "type": "module",
+  "scripts": {
+    "dev": "rollup --config rollup-dev.config.js -w",
+    "build": "rollup --config rollup-dev.config.js",
+    "publish": "pnpm run build && pnpm publish --access=public",
+    "build:win": "pnpm run build && node --experimental-sea-config sea-config.json && node -e \"require('fs').copyFileSync(process.execPath, 'bili.exe')\" && npx postject bili.exe NODE_SEA_BLOB sea-prep.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2 "
+  },
+  "keywords": [
+    "bilibili",
+    "download",
+    "cli",
+    "bili"
+  ],
+  "author": "renmu123",
+  "license": "GPLv3",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "bili": "bin/command.js"
+  },
+  "files": [
+    "bin"
+  ],
+  "dependencies": {
+    "axios": "^1.6.7",
+    "fast-xml-parser": "^4.3.4",
+    "hlsdownloader": "^3.0.3",
+    "m3u8-dln": "^0.0.3",
+    "m3u8-parser": "^7.1.0"
+  },
+  "devDependencies": {
+    "@kineticcafe/rollup-plugin-delete": "3.0.0-beta.0",
+    "@renmu/bili-api": "^1.1.1",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@types/cli-progress": "^3.11.5",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "20.10.0",
+    "@types/qrcode": "^1.5.5",
+    "cli-progress": "^3.12.0",
+    "commander": "^11.1.0",
+    "fs-extra": "^11.2.0",
+    "qrcode": "^1.5.3",
+    "rollup": "^4.9.2",
+    "rollup-plugin-copy": "^3.5.0",
+    "rollup-plugin-dts": "^6.1.0",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.3",
+    "winston": "^3.11.0"
+  }
+}

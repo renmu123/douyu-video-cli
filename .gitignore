@@ -1,0 +1,24 @@
+# Intellij
+*.iml
+.idea
+
+# npm
+node_modules
+
+# build
+*.js.map
+
+dist
+*.code-workspace
+
+test.js
+cookies.json
+cookie2.json
+test.flv
+.node-version
+bin
+
+*.mp3
+*.mp4
+sea-prep.blob
+bili.exe
