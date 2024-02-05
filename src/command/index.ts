@@ -7,10 +7,8 @@ import type { Logger } from "winston";
 
 import { version } from "../../package.json";
 import up from "../core/up";
-import { downloadVideo, getAllDanmu } from "../core/index";
-import qrcode from "qrcode";
-import { appPath, cookiePath, readConfig, writeConfig } from "../core/config";
-import { extractBVNumber } from "../utils/index";
+import { downloadVideos, saveDanmu } from "../core/index";
+import { appPath, readConfig, writeConfig } from "../core/config";
 import logger from "../utils/log";
 
 import type { DownloadOptions } from "../types/index";
@@ -24,36 +22,26 @@ process.on("uncaughtException", err => {
 });
 
 const program = new Command();
-program.name("bili").description("b站命令行").version(version);
-
-program
-  .command("login")
-  .description("登录b站账号")
-  .action(async () => {
-    logger.info(`请扫码登录，如果无法登录，`);
-    const { url, tv } = await up.login();
-    const qrcodePath = path.join(appPath, "qrcode.png");
-    qrcode.toFile(qrcodePath, url);
-    logger.info(
-      `请扫码登录，如果无法登录，请前往打开${qrcodePath}二维码图片进行登录`
-    );
-    qrcode.toString(url, { type: "terminal", small: true }).then(console.log);
-    tv.on("completed", async res => {
-      await fs.writeJSON(cookiePath, res.data);
-      logger.info("登录信息已保存");
-    });
-    tv.on("error", err => {
-      console.error(err.message);
-    });
-  });
+program.name("douyu").description("斗鱼视频命令行").version(version);
 
 program
   .command("download [url]")
   .description("下载视频")
-  .option("-o, --output <string>", "输出文件")
-  .action(async (url, opts: any) => {
-    const downloader = await downloadVideo(url, opts.output);
-  });
+  .option("--all", "下载所有分p")
+  .option("-d, --danmaku", "下载弹幕")
+  .option("-r, --rewrite", "覆盖已有文件")
+  .action(
+    async (
+      url,
+      opts: {
+        all?: boolean;
+        danmaku?: boolean;
+        rewrite?: boolean;
+      }
+    ) => {
+      const downloader = await downloadVideos(url, opts);
+    }
+  );
 
 const subscribeSubCommand = program
   .command("subscribe")
@@ -65,10 +53,7 @@ subscribeSubCommand
   .description("下载订阅")
   .option("-f, --force", "强制下载，忽略验证")
   .option("--all", "下载所有分p")
-  .option("-c, --cover", "下载封面")
   .option("-d, --danmaku", "下载弹幕")
-  .option("-m, --meta", "视频信息")
-  .option("-nv, --no-video", "不下载视频")
   .action(
     async (
       options: DownloadOptions & {
@@ -83,18 +68,18 @@ subscribeSubCommand
 
 subscribeSubCommand
   .command("add")
-  .description("添加一个up主到订阅")
-  .argument("<number>", "uid")
-  .action((uid: number) => {
-    up.subscribe(Number(uid));
+  .description("添加一个主播到订阅")
+  .argument("<number>", "roomId")
+  .action((roomId: number) => {
+    up.subscribe(Number(roomId));
   });
 
 subscribeSubCommand
   .command("remove")
-  .description("移除一个订阅的up主")
-  .argument("<number>", "uid")
-  .action((uid: string) => {
-    up.unSubscribe(Number(uid));
+  .description("移除一个订阅的主播")
+  .argument("<number>", "roomId")
+  .action((roomId: string) => {
+    up.unSubscribe(Number(roomId));
   });
 
 subscribeSubCommand
@@ -102,7 +87,7 @@ subscribeSubCommand
   .description("显示所有订阅")
   .action(async () => {
     const data = (await up.list()).map(item => {
-      return { uid: item.uid, name: item.name };
+      return { roomId: item.roomId, name: item.name };
     });
     console.table(data);
   });
@@ -115,10 +100,7 @@ subscribeSubCommand
     "时间间隔，单位分钟，默认10，请勿调整过低，以免撞上风控"
   )
   .option("--all", "下载所有分p")
-  .option("-c, --cover", "下载封面")
   .option("-d, --danmaku", "下载弹幕")
-  .option("-m, --meta", "视频信息")
-  .option("-nv, --no-video", "不下载视频")
   .action(
     async (
       options: DownloadOptions & {
@@ -172,7 +154,7 @@ program
   .argument("<vid>", "vid")
   .requiredOption("-o, --output <string>", "输出文件")
   .action(async (vid, opts: any) => {
-    const data = await getAllDanmu(vid, opts.output);
+    const data = await saveDanmu(vid, opts.output);
     // console.log(data, data.length);
     // fs.writeJSON(opts.output, data);
   });

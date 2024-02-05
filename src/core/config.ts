@@ -2,19 +2,18 @@ import os from "node:os";
 import path from "node:path";
 import fs from "fs-extra";
 
-export const appPath = path.join(os.homedir(), ".bili-cli");
+export const appPath = path.join(os.homedir(), ".douyu-video-cli");
 export const configPath = path.join(appPath, "config.json");
 export const dataPath = path.join(appPath, "data.json");
-export const cookiePath = path.join(appPath, "cookie.json");
 export const logPath = path.join(appPath, "log.txt");
 
 fs.ensureDir(appPath);
 
 interface Config {
   upList: {
-    uid: number;
+    roomId: number;
     name: string;
-    avatar: string;
+    upId: string;
   }[];
   downloadPath: string;
   ffmpegBinPath: string;
