@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs-extra";
 
+import axios from "axios";
 import { mergeM3U8 } from "../utils/ffmpeg";
 import { downloadHLS, sanitizeFileName, convert2Xml } from "../utils/index";
 import {
@@ -35,7 +36,11 @@ const modifyM3U8 = async (m3u8File: string, outputFile: string) => {
 /**
  * 下载订阅
  */
-export const subscribe = async (options: { danmaku?: boolean }) => {
+export const subscribe = async (options: {
+  danmaku?: boolean;
+  webhook?: boolean;
+  url?: string;
+}) => {
   const upList = await up.list();
   const records = (await readData()).map(item => item.videoId);
 
@@ -63,6 +68,8 @@ export const subscribe = async (options: { danmaku?: boolean }) => {
         all: false,
         danmaku: options.danmaku,
         rewrite: false,
+        url: options.url,
+        webhook: options.webhook,
       });
     } catch (error) {
       logger.error(`下载视频${videoId}失败`, error);
@@ -81,6 +88,8 @@ export const downloadVideos = async (
     all?: boolean;
     danmaku?: boolean;
     rewrite?: boolean;
+    url?: string;
+    webhook?: boolean;
   } = {
     all: false,
     danmaku: false,
@@ -95,27 +104,54 @@ export const downloadVideos = async (
   if (opts.all) {
     const res = await getVideos(videoId, videoData.ROOM.up_id);
     for (const video of res.list) {
-      const output = path.join(
-        downloadDir,
-        `${sanitizeFileName(video.title)}.mp4`
-      );
+      const name = sanitizeFileName(video.title);
+      const output = path.join(downloadDir, `${name}.mp4`);
+      if (opts.webhook && opts.url) {
+        // TODO:webhook需要处理排序
+        await axios.post(opts.url, {
+          event: "FileOpening",
+          filePath: output,
+          roomId: videoData.DATA.content.room_id,
+          time: "2021-05-14T17:52:54.946",
+          title: video.title,
+          username: videoData.ROOM.author_name,
+        });
+      }
+
       logger.info(`开始下载视频${output}`);
       await downloadVideo(video.hash_id, output, opts.rewrite);
 
       if (opts.danmaku) {
-        const danmuOutput = path.join(
-          downloadDir,
-          `${sanitizeFileName(video.title)}.xml`
-        );
+        const danmuOutput = path.join(downloadDir, `${name}.xml`);
         logger.info(`开始下载弹幕${danmuOutput}`);
         await saveDanmu(video.hash_id, danmuOutput, opts.rewrite);
       }
+
+      if (opts.webhook && opts.url) {
+        await axios.post(opts.url, {
+          event: "FileClosed",
+          filePath: output,
+          roomId: videoData.DATA.content.room_id,
+          time: "2021-05-14T17:52:54.946",
+          title: video.title,
+          username: videoData.ROOM.author_name,
+        });
+      }
     }
   } else {
-    const output = path.join(
-      downloadDir,
-      `${sanitizeFileName(videoData.ROOM.name)}.mp4`
-    );
+    const name = sanitizeFileName(videoData.ROOM.name);
+    const output = path.join(downloadDir, `${name}.mp4`);
+
+    if (opts.webhook && opts.url) {
+      await axios.post(opts.url, {
+        event: "FileOpening",
+        filePath: output,
+        roomId: videoData.DATA.content.room_id,
+        time: "2021-05-14T17:52:54.946",
+        title: name,
+        username: videoData.ROOM.author_name,
+      });
+    }
     logger.info(`开始下载视频${output}`);
     await downloadVideo(videoId, output, opts.rewrite);
 
@@ -126,6 +162,16 @@ export const downloadVideos = async (
       );
       logger.info(`开始下载弹幕${danmuOutput}`);
       await saveDanmu(videoId, danmuOutput, opts.rewrite);
+    }
+    if (opts.webhook && opts.url) {
+      await axios.post(opts.url, {
+        event: "FileClosed",
+        filePath: output,
+        roomId: videoData.DATA.content.room_id,
+        time: "2021-05-14T17:52:54.946",
+        title: name,
+        username: videoData.ROOM.author_name,
+      });
     }
   }
 };

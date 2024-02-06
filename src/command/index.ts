@@ -50,11 +50,20 @@ subscribeSubCommand
   .command("download")
   .description("下载订阅")
   .option("-d, --danmaku", "下载弹幕")
-  .action(async (options: { force?: boolean; danmaku?: boolean }) => {
-    const config = await readConfig();
-    logger.info(`开始下载订阅，视频将会被保存在${config.downloadPath}文件中`);
-    subscribe(options);
-  });
+  .option("-w, --webhook", "使用webhook")
+  .option("--url", "webhook地址")
+  .action(
+    async (options: {
+      force?: boolean;
+      danmaku?: boolean;
+      webhook?: boolean;
+      url?: string;
+    }) => {
+      const config = await readConfig();
+      logger.info(`开始下载订阅，视频将会被保存在${config.downloadPath}文件中`);
+      subscribe(options);
+    }
+  );
 
 subscribeSubCommand
   .command("add")
@@ -90,27 +99,36 @@ subscribeSubCommand
     "时间间隔，单位分钟，默认10，请勿调整过低，以免撞上风控"
   )
   .option("-d, --danmaku", "下载弹幕")
-  .action(async (options: { interval?: number; danmaku?: boolean }) => {
-    let interval = 10;
+  .option("-w, --webhook", "使用webhook")
+  .option("--url", "webhook地址", "http://127.0.0.1:18010/custom")
+  .action(
+    async (options: {
+      interval?: number;
+      danmaku?: boolean;
+      webhook?: boolean;
+      url?: string;
+    }) => {
+      let interval = 10;
 
-    if (options.interval) {
-      if (Number.isNaN(Number(options.interval))) {
-        console.error("时间间隔必须是数字");
-        return;
-      } else {
-        interval = Number(options.interval);
+      if (options.interval) {
+        if (Number.isNaN(Number(options.interval))) {
+          console.error("时间间隔必须是数字");
+          return;
+        } else {
+          interval = Number(options.interval);
+        }
       }
+
+      subscribe(options);
+      setInterval(() => {
+        try {
+          subscribe(options);
+        } catch (err) {
+          logger.error(err.message);
+        }
+      }, 1000 * 60 * interval);
     }
-
-    subscribe(options);
-    setInterval(() => {
-      try {
-        subscribe(options);
-      } catch (err) {
-        logger.error(err.message);
-      }
-    }, 1000 * 60 * interval);
-  });
+  );
 
 const configSubCommand = program.command("config").description("配置项");
 configSubCommand

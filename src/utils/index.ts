@@ -3,7 +3,6 @@ import { Readable } from "stream";
 import { finished } from "stream/promises";
 // @ts-ignore
 import HLSDownloader from "hlsdownloader";
-import { m3u8DLN } from "m3u8-dln";
 import { XMLBuilder } from "fast-xml-parser";
 
 import type { DanmuItem } from "../types/index";
@@ -46,10 +45,6 @@ export const downloadHLS = async (
     ...options,
   });
   return downloader.startDownload();
-};
-
-export const downloadM3u8 = async (url: string, filePath: string) => {
-  return m3u8DLN(url, filePath);
 };
 
 /**
@@ -131,4 +126,8 @@ export function convert2Xml(data: DanmuItem[]) {
   return `
 <?xml version="1.0" encoding="utf-8"?>
 ${xmlContent}`;
+}
+
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
