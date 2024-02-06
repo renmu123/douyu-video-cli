@@ -21,11 +21,7 @@ interface Config {
 }
 
 interface Data {
-  uid: number;
-  videoName: string;
-  cid?: number[];
-  bvid: string;
-  pic: string;
+  videoId: string;
 }
 
 const defaultConfig: Config = {
@@ -70,8 +66,8 @@ export const pushData = async (item: Data) => {
   await fs.writeJSON(dataPath, data);
 };
 
-export const deleteData = async (bvid: string) => {
+export const deleteData = async (videoId: string) => {
   let data = await readData();
-  data = data.filter(item => item.bvid !== bvid);
+  data = data.filter(item => item.videoId !== videoId);
   await fs.writeJSON(dataPath, data);
 };

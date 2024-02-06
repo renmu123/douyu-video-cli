@@ -1,8 +1,8 @@
 {
   "name": "douyu-cli",
-  "version": "0.3.0",
+  "version": "0.1.0",
   "description": "斗鱼视频下载CLI",
-  "homepage": "",
+  "homepage": "https://github.com/renmu123/douyu-video-cli",
   "type": "module",
   "scripts": {
     "dev": "rollup --config rollup-dev.config.js -w",
@@ -11,10 +11,15 @@
     "build:win": "pnpm run build && node --experimental-sea-config sea-config.json && node -e \"require('fs').copyFileSync(process.execPath, 'bili.exe')\" && npx postject bili.exe NODE_SEA_BLOB sea-prep.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2 "
   },
   "keywords": [
-    "bilibili",
+    "douyu",
     "download",
     "cli",
-    "bili"
+    "video",
+    "斗鱼",
+    "视频",
+    "下载",
+    "直播",
+    "live"
   ],
   "author": "renmu123",
   "license": "GPLv3",
@@ -22,7 +27,7 @@
     "node": ">=18"
   },
   "bin": {
-    "bili": "bin/command.js"
+    "douyu": "bin/command.js"
   },
   "files": [
     "bin"

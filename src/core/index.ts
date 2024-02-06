@@ -2,14 +2,16 @@ import path from "path";
 import fs from "fs-extra";
 
 import { mergeM3U8 } from "../utils/ffmpeg";
+import { downloadHLS, sanitizeFileName, convert2Xml } from "../utils/index";
 import {
-  downloadHLS,
-  parseVideoId,
-  sanitizeFileName,
-  convert2Xml,
-} from "../utils/index";
-import { getDanmu, getStreamUrls, getVideos, parseVideo } from "./api";
-import { readConfig } from "./config";
+  getDanmu,
+  getStreamUrls,
+  getVideos,
+  parseVideo,
+  getReplayList,
+} from "./api";
+import up from "./up";
+import { readConfig, readData, pushData, deleteData } from "./config";
 import logger from "../utils/log";
 
 import type { DanmuItem } from "../types/index";
@@ -31,17 +33,60 @@ const modifyM3U8 = async (m3u8File: string, outputFile: string) => {
 };
 
 /**
+ * 下载订阅
+ */
+export const subscribe = async (options: { danmaku?: boolean }) => {
+  const upList = await up.list();
+  const records = (await readData()).map(item => item.videoId);
+
+  let videoIds: string[] = [];
+  for (const up of upList) {
+    const replayList = await getReplayList({
+      up_id: up.upId,
+      page: 1,
+      limit: 2,
+    });
+    for (const replay of replayList.list) {
+      for (const video of replay.video_list) {
+        const videos = await getVideos(video.hash_id, up.upId);
+        videoIds.push(...videos.list.map(item => item.hash_id));
+      }
+    }
+  }
+  videoIds = Array.from(new Set(videoIds));
+  videoIds = videoIds.filter(id => !records.includes(id));
+
+  for (const videoId of videoIds) {
+    await pushData({ videoId });
+    try {
+      await downloadVideos(videoId, {
+        all: false,
+        danmaku: options.danmaku,
+        rewrite: false,
+      });
+    } catch (error) {
+      logger.error(`下载视频${videoId}失败`, error);
+      await deleteData(videoId);
+      throw error;
+    }
+  }
+};
+
+/**
  * 下载视频
  */
 export const downloadVideos = async (
-  url: string,
+  videoId: string,
   opts: {
     all?: boolean;
     danmaku?: boolean;
     rewrite?: boolean;
+  } = {
+    all: false,
+    danmaku: false,
+    rewrite: false,
   }
 ) => {
-  const videoId = parseVideoId(url);
   const videoData = await parseVideo(videoId);
   // console.log("parseVideoRes", parseVideoRes);
   const config = await readConfig();

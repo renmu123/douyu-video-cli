@@ -1,17 +1,13 @@
 #!/usr/bin/env node
-import path from "node:path";
-import fs from "fs-extra";
-
 import { Command } from "commander";
-import type { Logger } from "winston";
-
 import { version } from "../../package.json";
 import up from "../core/up";
-import { downloadVideos, saveDanmu } from "../core/index";
-import { appPath, readConfig, writeConfig } from "../core/config";
+import { downloadVideos, saveDanmu, subscribe } from "../core/index";
+import { readConfig, writeConfig } from "../core/config";
+import { parseVideoId } from "../utils/index";
 import logger from "../utils/log";
 
-import type { DownloadOptions } from "../types/index";
+import type { Logger } from "winston";
 
 declare global {
   var logger: Logger;
@@ -22,12 +18,12 @@ process.on("uncaughtException", err => {
 });
 
 const program = new Command();
-program.name("douyu").description("斗鱼视频命令行").version(version);
+program.name("douyu").description("斗鱼视频下载命令行").version(version);
 
 program
   .command("download [url]")
   .description("下载视频")
-  .option("--all", "下载所有分p")
+  .option("-a, --all", "下载所有分p")
   .option("-d, --danmaku", "下载弹幕")
   .option("-r, --rewrite", "覆盖已有文件")
   .action(
@@ -39,7 +35,9 @@ program
         rewrite?: boolean;
       }
     ) => {
-      const downloader = await downloadVideos(url, opts);
+      const videoId = parseVideoId(url);
+
+      const downloader = await downloadVideos(videoId, opts);
     }
   );
 
@@ -51,20 +49,12 @@ const subscribeSubCommand = program
 subscribeSubCommand
   .command("download")
   .description("下载订阅")
-  .option("-f, --force", "强制下载，忽略验证")
-  .option("--all", "下载所有分p")
   .option("-d, --danmaku", "下载弹幕")
-  .action(
-    async (
-      options: DownloadOptions & {
-        force?: boolean;
-      }
-    ) => {
-      const config = await readConfig();
-      logger.info(`开始下载订阅，视频将会被保存在${config.downloadPath}文件中`);
-      // subscribe(options);
-    }
-  );
+  .action(async (options: { force?: boolean; danmaku?: boolean }) => {
+    const config = await readConfig();
+    logger.info(`开始下载订阅，视频将会被保存在${config.downloadPath}文件中`);
+    subscribe(options);
+  });
 
 subscribeSubCommand
   .command("add")
@@ -99,35 +89,28 @@ subscribeSubCommand
     "-i, --interval <number>",
     "时间间隔，单位分钟，默认10，请勿调整过低，以免撞上风控"
   )
-  .option("--all", "下载所有分p")
   .option("-d, --danmaku", "下载弹幕")
-  .action(
-    async (
-      options: DownloadOptions & {
-        interval?: number;
-      }
-    ) => {
-      let interval = 10;
+  .action(async (options: { interval?: number; danmaku?: boolean }) => {
+    let interval = 10;
 
-      if (options.interval) {
-        if (Number.isNaN(Number(options.interval))) {
-          console.error("时间间隔必须是数字");
-          return;
-        } else {
-          interval = Number(options.interval);
-        }
+    if (options.interval) {
+      if (Number.isNaN(Number(options.interval))) {
+        console.error("时间间隔必须是数字");
+        return;
+      } else {
+        interval = Number(options.interval);
       }
-
-      // subscribe(options);
-      // setInterval(() => {
-      //   try {
-      //     subscribe(options);
-      //   } catch (err) {
-      //     logger.error(err.message);
-      //   }
-      // }, 1000 * 60 * interval);
     }
-  );
+
+    subscribe(options);
+    setInterval(() => {
+      try {
+        subscribe(options);
+      } catch (err) {
+        logger.error(err.message);
+      }
+    }, 1000 * 60 * interval);
+  });
 
 const configSubCommand = program.command("config").description("配置项");
 configSubCommand
