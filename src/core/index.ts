@@ -15,7 +15,7 @@ import up from "./up";
 import { readConfig, readData, pushData, deleteData } from "./config";
 import logger from "../utils/log";
 
-import type { DanmuItem } from "../types/index";
+import type { DanmuItem, Video } from "../types/index";
 
 const modifyM3U8 = async (m3u8File: string, outputFile: string) => {
   const data = await fs.readFile(m3u8File);
@@ -97,7 +97,6 @@ export const downloadVideos = async (
   }
 ) => {
   const videoData = await parseVideo(videoId);
-  // console.log("parseVideoRes", parseVideoRes);
   const config = await readConfig();
   const downloadDir = config.downloadPath;
 
@@ -119,7 +118,7 @@ export const downloadVideos = async (
       }
 
       logger.info(`开始下载视频${output}`);
-      await downloadVideo(video.hash_id, output, opts.rewrite);
+      await downloadVideo(videoData, output, opts.rewrite);
 
       if (opts.danmaku) {
         const danmuOutput = path.join(downloadDir, `${name}.xml`);
@@ -153,7 +152,7 @@ export const downloadVideos = async (
       });
     }
     logger.info(`开始下载视频${output}`);
-    await downloadVideo(videoId, output, opts.rewrite);
+    await downloadVideo(videoData, output, opts.rewrite);
 
     if (opts.danmaku) {
       const danmuOutput = path.join(
@@ -180,7 +179,7 @@ export const downloadVideos = async (
  * 下载单个视频
  */
 export const downloadVideo = async (
-  videoId: string,
+  video: Video,
   output: string,
   rewrite = false
 ) => {
@@ -188,16 +187,17 @@ export const downloadVideo = async (
     logger.info(`文件已存在，跳过下载`);
     return;
   }
-  const streamUrl = await getBigestStream(videoId);
-  console.log("streamUrl", streamUrl);
+  const data = video.decode(video.ROOM.vid);
+  const streamUrl = await getBigestStream(data);
+  logger.info(`streamUrl: ${streamUrl}`);
   await saveVideo(streamUrl, output);
 };
 
 /**
  * 获取最高清晰度的视频流
  */
-const getBigestStream = async (videoId: string) => {
-  const res = await getStreamUrls(videoId);
+const getBigestStream = async (data: string) => {
+  const res = await getStreamUrls(data);
   const streams = Object.values(res.thumb_video);
   if (streams.length === 0) {
     throw new Error("没有找到视频流");
@@ -218,6 +218,7 @@ const saveVideo = async (url: string, output: string) => {
     retry: { limit: 2 },
     overwrite: false,
   });
+  logger.info(`hls: ${hls}`);
   if (hls.error && hls.erroe.length > 0) {
     throw new Error("下载失败");
   }
@@ -225,7 +226,7 @@ const saveVideo = async (url: string, output: string) => {
   const m3u8File = `${path.join(tempDir, m3u8Path)}`;
   const m3u8NewFile = `${m3u8File}.new.m3u8`;
   await modifyM3U8(m3u8File, m3u8NewFile);
-  console.log("m3u8Path", `${path.join(tempDir, m3u8Path)}`);
+  logger.info(`m3u8Path: ${path.join(tempDir, m3u8Path)}`);
   await mergeM3U8(m3u8NewFile, output, []);
   await fs.remove(tempDir);
 };
@@ -243,7 +244,6 @@ export async function saveDanmu(vid: string, output: string, rewrite = false) {
     startTime = res.data.end_time;
     const list: any[] = res.data.list;
     items.push(...list);
-    // console.log("getDanmu", list.length, startTime);
   }
   await fs.writeFile(output, convert2Xml(items));
   return items;

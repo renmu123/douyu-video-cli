@@ -8,6 +8,7 @@ import { parseVideoId } from "../utils/index";
 import logger from "../utils/log";
 
 import type { Logger } from "winston";
+import type { Config } from "../types/index";
 
 declare global {
   var logger: Logger;
@@ -144,8 +145,7 @@ configSubCommand
   .description("设置配置项")
   .argument("<string>", "key")
   .argument("<string>", "value")
-  .action(async (key: string, value: string) => {
-    // @ts-ignore
+  .action(async <K extends keyof Config>(key: K, value: Config[K]) => {
     writeConfig(key, value);
   });
 
@@ -156,8 +156,6 @@ program
   .requiredOption("-o, --output <string>", "输出文件")
   .action(async (vid, opts: any) => {
     const data = await saveDanmu(vid, opts.output);
-    // console.log(data, data.length);
-    // fs.writeJSON(opts.output, data);
   });
 
 program.parse();

@@ -2,23 +2,14 @@ import os from "node:os";
 import path from "node:path";
 import fs from "fs-extra";
 
+import type { Config } from "../types/index";
+
 export const appPath = path.join(os.homedir(), ".douyu-video-cli");
 export const configPath = path.join(appPath, "config.json");
 export const dataPath = path.join(appPath, "data.json");
 export const logPath = path.join(appPath, "log.txt");
 
 fs.ensureDir(appPath);
-
-interface Config {
-  upList: {
-    roomId: number;
-    name: string;
-    upId: string;
-  }[];
-  downloadPath: string;
-  ffmpegBinPath: string;
-  logLevel: string;
-}
 
 interface Data {
   videoId: string;

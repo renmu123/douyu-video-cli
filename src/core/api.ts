@@ -1,5 +1,12 @@
 import axios from "axios";
-import douyu_encrypt from "../utils/douyu_source_script";
+// @ts-ignore
+import CryptoJS from "crypto-js";
+
+import type { Video } from "../types/index";
+import { parseScript, parseFunctionName } from "../utils/index";
+
+// @ts-ignore
+global.CryptoJS = CryptoJS;
 
 /**
  * 获取视频弹幕
@@ -33,33 +40,10 @@ async function requestPointId(videoId: string) {
 }
 
 /**
- * 获取视频流加密参数
- * @param videoId 视频id
- */
-async function parseParams(videoId: string) {
-  // 第一个参数: pointId
-  const pointId = await requestPointId(videoId);
-
-  // 第二个参数: 固定值 '10000000000000000000000000001501'
-  const did = "d6122a55e9f2d9ff39d9092800001701";
-
-  // 第三个参数: 时间戳 parseInt((new Date).getTime() / 1e3, 10)
-  const s = Math.floor(new Date().getTime() / 1e3);
-
-  // 加密后的字符串参数
-  const p = douyu_encrypt(pointId, did, s);
-
-  // 最终参数
-  const t = `${p}&vid=${videoId}`;
-
-  return t;
-}
-
-/**
  * 获取视频流
  * @param videoId 视频id
  */
-export async function getStreamUrls(videoId: string): Promise<{
+export async function getStreamUrls(data: string): Promise<{
   timestamp: number;
   thumb_video: {
     [key: string]: {
@@ -75,7 +59,6 @@ export async function getStreamUrls(videoId: string): Promise<{
     };
   };
 }> {
-  const data = await parseParams(videoId);
   const response = await axios({
     method: "POST",
     data: data,
@@ -126,24 +109,9 @@ export async function getVideos(
 /**
  * 解析视频页
  */
-export async function parseVideo(videoId: string): Promise<{
-  ROOM: {
-    vid: string;
-    point_id: string;
-    up_id: string;
-    author_name: string;
-    name: string;
-  };
-  DATA: {
-    content: {
-      room_id: string;
-    };
-  };
-}> {
+export async function parseVideo(videoId: string): Promise<Video> {
   const response = await axios.get(`https://v.douyu.com/show/${videoId}`);
-
   const regex = /window\.\$DATA\s*=\s*({.*?});/s;
-
   // Match the regular expression in the HTML
   const match = response.data.match(regex);
 
@@ -151,7 +119,30 @@ export async function parseVideo(videoId: string): Promise<{
     // Extracted JSON data
     const jsonDataString = match[1];
     // console.log("jsonDataString", eval("(" + jsonDataString + ")"));
-    return eval("(" + jsonDataString + ")");
+    const data = eval("(" + jsonDataString + ")");
+
+    const scripts = await parseScript(response.data);
+    const decodeScript = scripts.at(-2);
+    const decodeFuction = parseFunctionName(decodeScript)[0];
+
+    return {
+      ...data,
+      decode: (videoId: string) => {
+        const pointId = data.ROOM.point_id;
+        // 第二个参数: 从cookie中获取，试试看使用固定值
+        const did = "d6122a55e9f2d9ff39d9092800001701";
+        // 第三个参数: 时间戳 parseInt((new Date).getTime() / 1e3, 10)
+        const s = Math.floor(new Date().getTime() / 1e3);
+        // 加密后的字符串参数
+        const p = eval(
+          `${decodeScript};${decodeFuction}(${pointId}, "${did}", ${s})`
+        );
+        // 最终参数
+        const t = `${p}&vid=${videoId}`;
+
+        return t;
+      },
+    };
   } else {
     throw new Error("JSON data not found in the HTML.");
   }

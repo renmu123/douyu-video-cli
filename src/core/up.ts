@@ -9,7 +9,6 @@ const subscribe = async (roomId: number) => {
     throw new Error("已经订阅过了");
   }
   const room = await getRoomInfo(roomId);
-  console.log(room);
   if (!room.room) throw new Error("请确认房间号是否正确");
 
   const item = {

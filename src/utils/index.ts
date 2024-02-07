@@ -131,3 +131,32 @@ ${xmlContent}`;
 export function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+/**
+ * 解析函数名称
+ */
+export function parseFunctionName(html: string): string[] {
+  var functionRegex = /function\s+([a-zA-Z0-9_]+)\(/g;
+  var match;
+  var functions = [];
+
+  while ((match = functionRegex.exec(html)) !== null) {
+    functions.push(match[1]);
+  }
+
+  return functions;
+}
+/**
+ * 解析script标签
+ */
+export async function parseScript(html: string): Promise<string[]> {
+  var scriptRegex = /<script\b[^>]*>([\s\S]*?)<\/script>/g;
+  var match;
+  var scripts = [];
+
+  while ((match = scriptRegex.exec(html)) !== null) {
+    scripts.push(match[1]);
+  }
+
+  return scripts;
+}

@@ -22,7 +22,7 @@ export function mergeM3U8(
       "-y",
       outputFilepath,
     ];
-    console.log(`${ffmpegBinPath} ${args.join(" ")}`);
+    // console.log(`${ffmpegBinPath} ${args.join(" ")}`);
     const ffmpeg = spawn(ffmpegBinPath, args);
 
     ffmpeg.stdout.pipe(process.stdout);
