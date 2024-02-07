@@ -59,9 +59,35 @@ Options:
 
 ### 下载订阅
 
+这个功能会读取订阅主播最近的一次直播回放并进行下载，已下载过的任务不会重复下载。
+
+#### webhook 功能
+
+在视频下载前会发送类似的包给 webhook 服务器：
+filePath: 下载完成后的文件地址
+roomId: 房间号
+time:
+
+```bash
+curl --location 'http://127.0.0.1:18010/custom' \
+--header 'Content-Type: application/json' \
+--data '{
+    "event":"FileOpening",
+    "filePath":"D:\\aa.mp4",
+    "roomId": 93589,
+    "time":"2021-05-14T17:52:54.946",
+    "title":"我是猪",
+    "username":"djw"
+}'
+```
+
+你可以搭配 [biliLive-tools](https://github.com/renmu123/biliLive-tools)（0.9.0 版本及以上：暂未正式发布） 使用来实现自动上传
+
 `douyu sub download`
 
-### 定时任务
+### 定时运行下载订阅任务
+
+默认时间间隔为 60 分钟，斗鱼录播的分隔时间约为 75 分钟，间隔调整为较短大致上也没什么用。
 
 `douyu sub server`
 

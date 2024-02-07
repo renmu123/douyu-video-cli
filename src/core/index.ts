@@ -49,7 +49,7 @@ export const subscribe = async (options: {
     const replayList = await getReplayList({
       up_id: up.upId,
       page: 1,
-      limit: 2,
+      limit: 1,
     });
     for (const replay of replayList.list) {
       for (const video of replay.video_list) {
@@ -106,7 +106,6 @@ export const downloadVideos = async (
       const name = sanitizeFileName(video.title);
       const output = path.join(downloadDir, `${name}.mp4`);
       if (opts.webhook && opts.url) {
-        // TODO:webhook需要处理排序
         await axios.post(opts.url, {
           event: "FileOpening",
           filePath: output,

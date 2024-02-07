@@ -1,5 +1,5 @@
 import { readConfig, writeConfig } from "./config";
-import { getRoomInfo } from "./api";
+import { getRoomInfo, getFishBarId } from "./api";
 
 const subscribe = async (roomId: number) => {
   const config = await readConfig();
@@ -11,10 +11,13 @@ const subscribe = async (roomId: number) => {
   const room = await getRoomInfo(roomId);
   if (!room.room) throw new Error("请确认房间号是否正确");
 
+  const fishBarId = await getFishBarId(roomId);
+
   const item = {
     roomId: roomId,
     name: room.room.nickname,
     upId: room.room.up_id,
+    fishBarId,
   };
 
   config.upList.push(item);

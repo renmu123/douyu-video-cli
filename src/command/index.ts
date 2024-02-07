@@ -95,10 +95,7 @@ subscribeSubCommand
 subscribeSubCommand
   .command("server")
   .description("定时运行sub命令，默认十分钟运行一次")
-  .option(
-    "-i, --interval <number>",
-    "时间间隔，单位分钟，默认10，请勿调整过低，以免撞上风控"
-  )
+  .option("-i, --interval <number>", "时间间隔，单位分钟，默认60分钟")
   .option("-d, --danmaku", "下载弹幕")
   .option("-w, --webhook", "使用webhook")
   .option("--url", "webhook地址", "http://127.0.0.1:18010/custom")
@@ -109,7 +106,7 @@ subscribeSubCommand
       webhook?: boolean;
       url?: string;
     }) => {
-      let interval = 10;
+      let interval = 60;
 
       if (options.interval) {
         if (Number.isNaN(Number(options.interval))) {

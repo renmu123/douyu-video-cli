@@ -207,3 +207,81 @@ export async function getRoomInfo(roomId: number): Promise<{
 
   return response.data;
 }
+
+/**
+ * 获取鱼吧Id
+ */
+export async function getFishBarId(roomId: number): Promise<number> {
+  const response = await axios.get(
+    `https://yuba.douyu.com/api/dy/anchor/anchorTopic`,
+    {
+      params: {
+        room_id: roomId,
+      },
+    }
+  );
+  const path = response.request.path;
+
+  if (path.includes("group")) {
+    return path.split("/").pop();
+  } else {
+    throw new Error("获取鱼吧Id失败");
+  }
+}
+
+/**
+ * 获取鱼吧视频列表
+ */
+export async function getFishBarVideoList(params: {
+  type: 1 | 2;
+  group_id: number;
+  page: number;
+  lastid: number;
+}): Promise<{
+  message: string;
+  normal: number;
+  playbacks: number;
+  status_code: number;
+  list: {
+    lastid: number;
+    list: {
+      /** 视频id */
+      hash_id: string;
+      uid: number;
+      is_vertical: number;
+      view_num: string;
+      video_str_duration: string;
+      duration: number;
+      type: string;
+      thumb: string;
+      thumb_ver: string;
+      player: string;
+      from: string;
+      swf: string;
+      title: string;
+      content: string;
+      is_short: number;
+      comments: string;
+      barrages: string;
+      post_id: string;
+      /** 时间戳（秒） */
+      create_time: number;
+      ishide: boolean;
+      resolution: string[];
+      like_num: number;
+      tag2: number;
+      scheme_url: string;
+      scheme_url_new: string;
+    }[];
+    time_line: string;
+  }[];
+}> {
+  const response = await axios.get(
+    `https://yuba.douyu.com/wbapi/web/group/videolist`,
+    {
+      params: params,
+    }
+  );
+
+  return response.data.data;
+}

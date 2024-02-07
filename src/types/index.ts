@@ -36,6 +36,7 @@ export interface Config {
     roomId: number;
     name: string;
     upId: string;
+    fishBarId: number;
   }[];
   downloadPath: string;
   ffmpegBinPath: string;
