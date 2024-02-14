@@ -103,6 +103,7 @@ export const downloadVideos = async (
   if (opts.all) {
     const res = await getVideos(videoId, videoData.ROOM.up_id);
     for (const video of res.list) {
+      const videoData = await parseVideo(video.hash_id);
       const name = sanitizeFileName(video.title);
       const output = path.join(downloadDir, `${name}.mp4`);
       if (opts.webhook && opts.url) {
