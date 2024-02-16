@@ -60,6 +60,7 @@ subscribeSubCommand
       webhook?: boolean;
       url?: string;
     }) => {
+      // TODO:模板支持
       const config = await readConfig();
       logger.info(`开始下载订阅，视频将会被保存在${config.downloadPath}文件中`);
       subscribe(options);
