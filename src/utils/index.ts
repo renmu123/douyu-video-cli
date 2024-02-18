@@ -66,38 +66,53 @@ export function convert2Xml(data: DanmuItem[]) {
     format: true,
   });
   // 弹幕颜色
-  //   [{
-  //     type: 0,
-  //     color: "#FFFFFF"
-  // }, {
-  //     type: 7,
-  //     color: "#FF5654"
-  // }, {
-  //     type: 8,
-  //     color: "#FF7523"
-  // }, {
-  //     type: 9,
-  //     color: "#FE69B3"
-  // }, {
-  //     type: 10,
-  //     color: "#FFBC00"
-  // }, {
-  //     type: 11,
-  //     color: "#78C946"
-  // }, {
-  //     type: 12,
-  //     color: "#9E7FFF"
-  // }, {
-  //     type: 13,
-  //     color: "#3D9BFF"
-  // }]
+  const colorType = [
+    {
+      type: 0,
+      color: "#FFFFFF",
+    },
+    {
+      type: 7,
+      color: "#FF5654",
+    },
+    {
+      type: 8,
+      color: "#FF7523",
+    },
+    {
+      type: 9,
+      color: "#FE69B3",
+    },
+    {
+      type: 10,
+      color: "#FFBC00",
+    },
+    {
+      type: 11,
+      color: "#78C946",
+    },
+    {
+      type: 12,
+      color: "#9E7FFF",
+    },
+    {
+      type: 13,
+      color: "#3D9BFF",
+    },
+  ];
+  const colorMap = new Map<number, string>();
+  colorType.forEach(ele => {
+    colorMap.set(ele.type, ele.color);
+  });
   const elems = data.map(ele => {
     const data = {
       "@@p": "",
       "@@progress": String(ele.tl / 1000),
       "@@mode": String(1),
       "@@fontsize": String(25),
-      "@@color": String(16777215), // 白色
+      "@@color": String(
+        parseInt((colorMap.get(ele.col) || "#ffffff").replace("#", ""), 16)
+      ),
       "@@midHash": String(ele.mid),
       "#text": String(ele.ctt),
       "@@ctime": String(ele.sts),

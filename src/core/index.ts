@@ -40,6 +40,7 @@ export const subscribe = async (options: {
   danmaku?: boolean;
   webhook?: boolean;
   url?: string;
+  streamType?: string;
 }) => {
   const upList = await up.list();
   const records = (await readData()).map(item => item.videoId);
@@ -70,6 +71,7 @@ export const subscribe = async (options: {
         rewrite: false,
         url: options.url,
         webhook: options.webhook,
+        streamType: options.streamType,
       });
     } catch (error) {
       logger.error(`下载视频${videoId}失败`, error);
@@ -90,6 +92,7 @@ export const downloadVideos = async (
     rewrite?: boolean;
     url?: string;
     webhook?: boolean;
+    streamType?: string;
   } = {
     all: false,
     danmaku: false,
@@ -106,19 +109,23 @@ export const downloadVideos = async (
       const videoData = await parseVideo(video.hash_id);
       const name = sanitizeFileName(video.title);
       const output = path.join(downloadDir, `${name}.mp4`);
+      // console.log(JSON.stringify(videoData, null, 2));
       if (opts.webhook && opts.url) {
         await axios.post(opts.url, {
           event: "FileOpening",
           filePath: output,
           roomId: videoData.DATA.content.room_id,
-          time: "2021-05-14T17:52:54.946",
+          // time: "2021-05-14T17:52:54.946",
+          time: new Date(
+            videoData.DATA.content.start_time * 1000
+          ).toISOString(),
           title: video.title,
           username: videoData.ROOM.author_name,
         });
       }
 
       logger.info(`开始下载视频${output}`);
-      await downloadVideo(videoData, output, opts.rewrite);
+      await downloadVideo(videoData, output, opts);
 
       if (opts.danmaku) {
         const danmuOutput = path.join(downloadDir, `${name}.xml`);
@@ -131,7 +138,11 @@ export const downloadVideos = async (
           event: "FileClosed",
           filePath: output,
           roomId: videoData.DATA.content.room_id,
-          time: "2021-05-14T17:52:54.946",
+          time: new Date(
+            (videoData.DATA.content.start_time +
+              Math.floor(videoData.DATA.content.video_duration)) *
+              1000
+          ).toISOString(),
           title: video.title,
           username: videoData.ROOM.author_name,
         });
@@ -151,8 +162,8 @@ export const downloadVideos = async (
         username: videoData.ROOM.author_name,
       });
     }
-    logger.info(`开始下载视频${output}`);
-    await downloadVideo(videoData, output, opts.rewrite);
+    logger.info(`开始下载视频：${output}`);
+    await downloadVideo(videoData, output, opts);
 
     if (opts.danmaku) {
       const danmuOutput = path.join(
@@ -181,14 +192,17 @@ export const downloadVideos = async (
 export const downloadVideo = async (
   video: Video,
   output: string,
-  rewrite = false
+  opts: {
+    rewrite?: boolean;
+    streamType?: string;
+  }
 ) => {
-  if (!rewrite && (await fs.pathExists(output))) {
+  if (!opts.rewrite && (await fs.pathExists(output))) {
     logger.info(`文件已存在，跳过下载`);
     return;
   }
   const data = video.decode(video.ROOM.vid);
-  const streamUrl = await getBigestStream(data);
+  const streamUrl = await getStream(data, opts.streamType);
   logger.info(`streamUrl: ${streamUrl}`);
   await saveVideo(streamUrl, output);
 };
@@ -196,17 +210,25 @@ export const downloadVideo = async (
 /**
  * 获取最高清晰度的视频流
  */
-const getBigestStream = async (data: string) => {
+const getStream = async (data: string, streamType?: string) => {
   const res = await getStreamUrls(data);
   const streams = Object.values(res.thumb_video);
   if (streams.length === 0) {
     throw new Error("没有找到视频流");
   }
-
-  streams.sort((a, b) => {
-    return b.bit_rate - a.bit_rate;
-  });
-  return streams[0].url;
+  if (streamType) {
+    const stream = streams.find(item => item.stream_type === streamType);
+    if (stream) {
+      return stream.url;
+    } else {
+      throw new Error("没有对应清晰度的流");
+    }
+  } else {
+    streams.sort((a, b) => {
+      return b.bit_rate - a.bit_rate;
+    });
+    return streams[0].url;
+  }
 };
 
 /**
@@ -215,6 +237,7 @@ const getBigestStream = async (data: string) => {
 const saveVideo = async (url: string, output: string) => {
   const tempDir = `${output}-temp`;
   const hls = await downloadHLS(url, tempDir, {
+    concurrency: 10,
     retry: { limit: 2 },
     overwrite: false,
   });

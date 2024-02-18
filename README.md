@@ -44,8 +44,16 @@ Options:
   -a, --all      下载所有分p
   -d, --danmaku  下载弹幕
   -r, --rewrite  覆盖已有文件
+  -st, --stream-type 清晰度
   -h, --help     display help for command
 ```
+
+清晰度参数，默认为最大清晰度  
+大致清晰度供参考：  
+原画 2K60：1440p60a  
+高清 1080P60：1080p60  
+高清 720P：high  
+标清 480P：normal
 
 ## 订阅
 
@@ -81,7 +89,8 @@ curl --location 'http://127.0.0.1:18010/custom' \
 }'
 ```
 
-你可以搭配 [biliLive-tools](https://github.com/renmu123/biliLive-tools)（0.9.0 版本及以上：暂未正式发布） 使用来实现自动上传
+你可以搭配 [biliLive-tools](https://github.com/renmu123/biliLive-tools)（0.9.0 版本及以上：暂未正式发布） 使用来实现自动压制上传。
+如果需要将一天的录播设置为一个分 p，请开启断播续传功能，并将间隔设置了 100 分钟及以上。
 
 `douyu sub download`
 

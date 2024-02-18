@@ -26,6 +26,9 @@ export interface Video {
   DATA: {
     content: {
       room_id: string;
+      title: string;
+      start_time: number;
+      video_duration: number;
     };
   };
   decode: (videoId: string) => string;

@@ -27,6 +27,7 @@ program
   .option("-a, --all", "下载所有分p")
   .option("-d, --danmaku", "下载弹幕")
   .option("-r, --rewrite", "覆盖已有文件")
+  .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
   .action(
     async (
       url,
@@ -34,6 +35,7 @@ program
         all?: boolean;
         danmaku?: boolean;
         rewrite?: boolean;
+        streamType?: string;
       }
     ) => {
       const videoId = parseVideoId(url);
@@ -51,14 +53,16 @@ subscribeSubCommand
   .command("download")
   .description("下载订阅")
   .option("-d, --danmaku", "下载弹幕")
+  .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
   .option("-w, --webhook", "使用webhook")
-  .option("--url", "webhook地址")
+  .option("--url", "webhook地址", "http://127.0.0.1:18010/custom")
   .action(
     async (options: {
       force?: boolean;
       danmaku?: boolean;
       webhook?: boolean;
       url?: string;
+      streamType?: string;
     }) => {
       const config = await readConfig();
       logger.info(`开始下载订阅，视频将会被保存在${config.downloadPath}文件中`);
