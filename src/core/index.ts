@@ -128,7 +128,7 @@ export const downloadVideos = async (
 
       if (opts.danmaku) {
         const danmuOutput = path.join(downloadDir, `${name}.xml`);
-        logger.info(`开始下载弹幕${danmuOutput}`);
+        logger.info(`开始下载弹幕：${danmuOutput}`);
         await saveDanmu(video.hash_id, danmuOutput, opts.rewrite);
       }
 
@@ -169,7 +169,7 @@ export const downloadVideos = async (
         downloadDir,
         `${sanitizeFileName(videoData.ROOM.name)}.xml`
       );
-      logger.info(`开始下载弹幕${danmuOutput}`);
+      logger.info(`开始下载弹幕：${danmuOutput}`);
       await saveDanmu(videoId, danmuOutput, opts.rewrite);
     }
     if (opts.webhook && opts.url) {
@@ -240,7 +240,6 @@ const saveVideo = async (url: string, output: string) => {
     retry: { limit: 2 },
     overwrite: false,
   });
-  logger.info(`hls: ${hls}`);
   if (hls.error && hls.erroe.length > 0) {
     throw new Error("下载失败");
   }

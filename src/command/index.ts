@@ -158,13 +158,13 @@ configSubCommand
     writeConfig(key, value);
   });
 
-program
-  .command("dm")
-  .description("下载弹幕")
-  .argument("<vid>", "vid")
-  .requiredOption("-o, --output <string>", "输出文件")
-  .action(async (vid, opts: any) => {
-    const data = await saveDanmu(vid, opts.output);
-  });
+// program
+//   .command("dm")
+//   .description("下载弹幕")
+//   .argument("<vid>", "vid")
+//   .requiredOption("-o, --output <string>", "输出文件")
+//   .action(async (vid, opts: any) => {
+//     const data = await saveDanmu(vid, opts.output);
+//   });
 
 program.parse();

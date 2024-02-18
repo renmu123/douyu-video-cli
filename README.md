@@ -23,7 +23,6 @@ Commands:
   download [options] [url]  下载视频
   subscribe|sub             订阅
   config                    配置项
-  dm [options] <vid>        下载弹幕
   help [command]            display help for command
 ```
 
@@ -93,7 +92,7 @@ curl --location 'http://127.0.0.1:18010/custom' \
 ```
 
 你可以搭配 [biliLive-tools](https://github.com/renmu123/biliLive-tools)（0.9.0 版本及以上：暂未正式发布） 使用来实现自动压制上传。
-如果需要将一天的录播设置为一个分 p，请开启断播续传功能，并将间隔设置了 100 分钟及以上。
+如果需要将一天的录播设置为一个分 p，请开启断播续传功能，并将间隔设置了 100 分钟或以上。
 
 `douyu sub download`
 
@@ -127,7 +126,7 @@ curl --location 'http://127.0.0.1:18010/custom' \
 
 # 开发
 
-node<18 未经过测试
+node>=18
 
 ## Install
 
