@@ -41,6 +41,7 @@ export const subscribe = async (options: {
   webhook?: boolean;
   url?: string;
   streamType?: string;
+  dir?: string;
 }) => {
   const upList = await up.list();
   const records = (await readData()).map(item => item.videoId);
@@ -66,12 +67,9 @@ export const subscribe = async (options: {
     await pushData({ videoId });
     try {
       await downloadVideos(videoId, {
+        ...options,
         all: false,
-        danmaku: options.danmaku,
         rewrite: false,
-        url: options.url,
-        webhook: options.webhook,
-        streamType: options.streamType,
       });
     } catch (error) {
       logger.error(`下载视频${videoId}失败`, error);
@@ -93,6 +91,7 @@ export const downloadVideos = async (
     url?: string;
     webhook?: boolean;
     streamType?: string;
+    dir?: string;
   } = {
     all: false,
     danmaku: false,
@@ -101,7 +100,7 @@ export const downloadVideos = async (
 ) => {
   const videoData = await parseVideo(videoId);
   const config = await readConfig();
-  const downloadDir = config.downloadPath;
+  const downloadDir = opts.dir ?? config.downloadPath;
 
   if (opts.all) {
     const res = await getVideos(videoId, videoData.ROOM.up_id);

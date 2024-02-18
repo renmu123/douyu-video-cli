@@ -27,6 +27,7 @@ program
   .option("-a, --all", "下载所有分p")
   .option("-d, --danmaku", "下载弹幕")
   .option("-r, --rewrite", "覆盖已有文件")
+  .option("--dir", "下载目录")
   .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
   .action(
     async (
@@ -36,6 +37,7 @@ program
         danmaku?: boolean;
         rewrite?: boolean;
         streamType?: string;
+        dir?: string;
       }
     ) => {
       const videoId = parseVideoId(url);
@@ -54,6 +56,7 @@ subscribeSubCommand
   .description("下载订阅")
   .option("-d, --danmaku", "下载弹幕")
   .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
+  .option("--dir", "下载目录")
   .option("-w, --webhook", "使用webhook")
   .option("--url", "webhook地址", "http://127.0.0.1:18010/custom")
   .action(
@@ -63,10 +66,12 @@ subscribeSubCommand
       webhook?: boolean;
       url?: string;
       streamType?: string;
+      dir?: string;
     }) => {
       // TODO:模板支持
       const config = await readConfig();
-      logger.info(`开始下载订阅，视频将会被保存在${config.downloadPath}文件中`);
+      const downloadPath = options.dir ?? config.downloadPath;
+      logger.info(`开始下载订阅，视频将会被保存在${downloadPath}文件中`);
       subscribe(options);
     }
   );
@@ -99,9 +104,11 @@ subscribeSubCommand
 
 subscribeSubCommand
   .command("server")
-  .description("定时运行sub命令，默认十分钟运行一次")
+  .description("定时运行sub命令")
   .option("-i, --interval <number>", "时间间隔，单位分钟，默认60分钟")
   .option("-d, --danmaku", "下载弹幕")
+  .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
+  .option("--dir", "下载目录")
   .option("-w, --webhook", "使用webhook")
   .option("--url", "webhook地址", "http://127.0.0.1:18010/custom")
   .action(

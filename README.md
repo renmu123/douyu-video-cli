@@ -45,6 +45,7 @@ Options:
   -d, --danmaku  下载弹幕
   -r, --rewrite  覆盖已有文件
   -st, --stream-type 清晰度
+  --dir          下载文件夹，会覆盖config中的downloadPath
   -h, --help     display help for command
 ```
 
@@ -74,7 +75,9 @@ Options:
 在视频下载前会发送类似的包给 webhook 服务器：
 filePath: 下载完成后的文件地址
 roomId: 房间号
-time:
+time: 录播视频开始时间戳
+title: 分 p 标题
+username: 用户名
 
 ```bash
 curl --location 'http://127.0.0.1:18010/custom' \
