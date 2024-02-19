@@ -156,7 +156,7 @@ export const downloadVideos = async (
         event: "FileOpening",
         filePath: output,
         roomId: videoData.DATA.content.room_id,
-        time: "2021-05-14T17:52:54.946",
+        time: new Date(videoData.DATA.content.start_time * 1000).toISOString(),
         title: name,
         username: videoData.ROOM.author_name,
       });
@@ -177,7 +177,11 @@ export const downloadVideos = async (
         event: "FileClosed",
         filePath: output,
         roomId: videoData.DATA.content.room_id,
-        time: "2021-05-14T17:52:54.946",
+        time: new Date(
+          (videoData.DATA.content.start_time +
+            Math.floor(videoData.DATA.content.video_duration)) *
+            1000
+        ).toISOString(),
         title: name,
         username: videoData.ROOM.author_name,
       });
@@ -238,8 +242,9 @@ const saveVideo = async (url: string, output: string) => {
   const hls = await downloadHLS(url, tempDir, {
     concurrency: 10,
     retry: { limit: 2 },
-    overwrite: false,
+    overwrite: true,
   });
+  console.log(hls);
   if (hls.error && hls.erroe.length > 0) {
     throw new Error("下载失败");
   }

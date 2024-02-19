@@ -29,6 +29,8 @@ program
   .option("-r, --rewrite", "覆盖已有文件")
   .option("--dir", "下载目录")
   .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
+  .option("-w, --webhook", "使用webhook")
+  .option("--url", "webhook地址", "http://127.0.0.1:18010/custom")
   .action(
     async (
       url,
@@ -38,6 +40,8 @@ program
         rewrite?: boolean;
         streamType?: string;
         dir?: string;
+        webhook?: boolean;
+        url?: string;
       }
     ) => {
       const videoId = parseVideoId(url);
