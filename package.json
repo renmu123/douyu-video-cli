@@ -1,6 +1,6 @@
 {
   "name": "douyu-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "斗鱼视频下载CLI",
   "homepage": "https://github.com/renmu123/douyu-video-cli",
   "type": "module",
