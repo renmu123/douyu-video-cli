@@ -245,7 +245,8 @@ const saveVideo = async (url: string, output: string) => {
     overwrite: true,
   });
   console.log(hls);
-  if (hls.error && hls.erroe.length > 0) {
+  if (hls.errors && hls.errors.length > 0) {
+    await fs.remove(tempDir);
     throw new Error("下载失败");
   }
   const m3u8Path = new URL(url).pathname;
