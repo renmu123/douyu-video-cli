@@ -91,8 +91,8 @@ curl --location 'http://127.0.0.1:18010/custom' \
 }'
 ```
 
-你可以搭配 [biliLive-tools](https://github.com/renmu123/biliLive-tools)（0.9.0 版本及以上：暂未正式发布） 使用来实现自动压制上传。
-如果需要将一天的录播设置为一个分 p，请开启断播续传功能，并将间隔设置了 100 分钟或以上。
+你可以搭配 [biliLive-tools](https://github.com/renmu123/biliLive-tools)（0.9.0 版本及以上） 使用来实现自动压制上传。
+如果需要将一天的录播设置为一个分 p，请开启断播续传功能，并将间隔设置为录播间隔往上，建议设置 3 小时以上。
 
 `douyu sub download`
 
