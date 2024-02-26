@@ -5,7 +5,7 @@
 
 # 安装
 
-`npm install douyu-cli`
+`npm install -g douyu-cli`
 
 该程序依赖于`ffmpeg`，需要手动安装，程序默认会调用环境变量中的`ffmpeg`，如果想自定于或者无法调用，请使用`douyu config set ffmpegBinPath xxxx`手动设置可执行文件地址。
 
