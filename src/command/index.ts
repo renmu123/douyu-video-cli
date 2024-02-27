@@ -47,7 +47,6 @@ program
       }
     ) => {
       const videoId = parseVideoId(url);
-      console.log(opts);
       const downloader = await downloadVideos(videoId, opts);
     }
   );
