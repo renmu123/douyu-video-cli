@@ -31,6 +31,7 @@ program
   .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
   .option("-w, --webhook", "使用webhook")
   .option("--url", "webhook地址", "http://127.0.0.1:18010/custom")
+  .option("-nv, --no-video", "不下载视频")
   .action(
     async (
       url,
@@ -42,10 +43,10 @@ program
         dir?: string;
         webhook?: boolean;
         url?: string;
+        video?: boolean;
       }
     ) => {
       const videoId = parseVideoId(url);
-
       const downloader = await downloadVideos(videoId, opts);
     }
   );
@@ -63,6 +64,7 @@ subscribeSubCommand
   .option("--dir", "下载目录")
   .option("-w, --webhook", "使用webhook")
   .option("--url", "webhook地址", "http://127.0.0.1:18010/custom")
+  .option("-nv, --no-video", "不下载视频")
   .action(
     async (options: {
       force?: boolean;
@@ -71,6 +73,7 @@ subscribeSubCommand
       url?: string;
       streamType?: string;
       dir?: string;
+      video?: boolean;
     }) => {
       // TODO:模板支持
       const config = await readConfig();
@@ -115,12 +118,14 @@ subscribeSubCommand
   .option("--dir", "下载目录")
   .option("-w, --webhook", "使用webhook")
   .option("--url", "webhook地址", "http://127.0.0.1:18010/custom")
+  .option("-nv, --no-video", "不下载视频")
   .action(
     async (options: {
       interval?: number;
       danmaku?: boolean;
       webhook?: boolean;
       url?: string;
+      video?: boolean;
     }) => {
       let interval = 60;
 

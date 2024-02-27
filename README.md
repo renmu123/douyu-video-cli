@@ -46,6 +46,9 @@ Options:
   -r, --rewrite  覆盖已有文件
   -st, --stream-type 清晰度
   --dir          下载文件夹，会覆盖config中的downloadPath
+  -w, -webhook   启用webhook
+  --url          webhook地址
+  -nv, --no-video 不下载视频
   -h, --help     display help for command
 ```
 
@@ -73,10 +76,10 @@ Options:
 #### webhook 功能
 
 在视频下载前会发送类似的包给 webhook 服务器：
-filePath: 下载完成后的文件地址
+filePath: 下载完成后的文件地址  
 roomId: 房间号
-time: 录播视频开始时间戳
-title: 分 p 标题
+time: 录播视频开始时间戳  
+title: 分 p 标题  
 username: 用户名
 
 ```bash

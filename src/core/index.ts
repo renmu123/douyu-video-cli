@@ -42,6 +42,7 @@ export const subscribe = async (options: {
   url?: string;
   streamType?: string;
   dir?: string;
+  video?: boolean;
 }) => {
   const upList = await up.list();
   const records = (await readData()).map(item => item.videoId);
@@ -92,6 +93,7 @@ export const downloadVideos = async (
     webhook?: boolean;
     streamType?: string;
     dir?: string;
+    video?: boolean;
   } = {
     all: false,
     danmaku: false,
@@ -122,9 +124,10 @@ export const downloadVideos = async (
           username: videoData.ROOM.author_name,
         });
       }
-
-      logger.info(`开始下载视频${output}`);
-      await downloadVideo(videoData, output, opts);
+      if (opts.video) {
+        logger.info(`开始下载视频${output}`);
+        await downloadVideo(videoData, output, opts);
+      }
 
       if (opts.danmaku) {
         const danmuOutput = path.join(downloadDir, `${name}.xml`);
@@ -161,8 +164,10 @@ export const downloadVideos = async (
         username: videoData.ROOM.author_name,
       });
     }
-    logger.info(`开始下载视频：${output}`);
-    await downloadVideo(videoData, output, opts);
+    if (opts.video) {
+      logger.info(`开始下载视频：${output}`);
+      await downloadVideo(videoData, output, opts);
+    }
 
     if (opts.danmaku) {
       const danmuOutput = path.join(
