@@ -28,6 +28,9 @@ devDependencies:
   '@types/cli-progress':
     specifier: ^3.11.5
     version: 3.11.5
+  '@types/crypto-js':
+    specifier: ^4.2.2
+    version: 4.2.2
   '@types/fs-extra':
     specifier: ^11.0.4
     version: 11.0.4
@@ -50,8 +53,8 @@ devDependencies:
     specifier: ^11.2.0
     version: 11.2.0
   hlsdownloader:
-    specifier: ^3.0.3
-    version: 3.0.3
+    specifier: ^3.1.0
+    version: 3.1.0
   m3u8-parser:
     specifier: ^7.1.0
     version: 7.1.0
@@ -64,6 +67,9 @@ devDependencies:
   rollup-plugin-dts:
     specifier: ^6.1.0
     version: 6.1.0(rollup@4.9.6)(typescript@5.3.3)
+  safe-eval:
+    specifier: ^0.4.1
+    version: 0.4.1
   tslib:
     specifier: ^2.6.2
     version: 2.6.2
@@ -351,6 +357,10 @@ packages:
     resolution: {integrity: sha512-D4PbNRbviKyppS5ivBGyFO29POlySLmA2HyUFE4p5QGazAMM3CwkKWcvTl8gvElSuxRh6FPKL8XmidX873ou4g==}
     dependencies:
       '@types/node': 20.10.0
+    dev: true
+
+  /@types/crypto-js@4.2.2:
+    resolution: {integrity: sha512-sDOLlVbHhXpAUAL0YHDUUwDZf3iN4Bwi4W6a0W0b+QcAezUbRtH4FVb+9J4h+XFPW7l/gQ9F8qC7P+Ec4k8QVQ==}
     dev: true
 
   /@types/estree@1.0.5:
@@ -804,11 +814,11 @@ packages:
       function-bind: 1.1.2
     dev: true
 
-  /hlsdownloader@3.0.3:
-    resolution: {integrity: sha512-NiqLsFXau/G5zpxOuyHlgI7jLZmHdFTkLWSF/OLKB1QDgbCZPn4yVa5HjiEY1TujyF1T3kw3zi6dkSNCSRBSLg==}
+  /hlsdownloader@3.1.0:
+    resolution: {integrity: sha512-9WC8gKMQPEB2CP0ezWon9rJx3iBqX4oKghR3Yu8twqPUFrP6QrdOoOKP5hs7rz+rfqHfPUAWfQnOrV4m8+He3g==}
     engines: {node: '>=18', npm: '>=9'}
     dependencies:
-      ky: 1.2.0
+      ky: 1.2.2
       p-limit: 5.0.0
     dev: true
 
@@ -926,8 +936,8 @@ packages:
     resolution: {integrity: sha512-Xq9nH7KlWZmXAtodXDDRE7vs6DU1gTU8zYDHDiWLSip45Egwq3plLHzPn27NgvzL2r1LMPC1vdqh98sQxtqj4A==}
     dev: true
 
-  /ky@1.2.0:
-    resolution: {integrity: sha512-dnPW+T78MuJ9tLAiF/apJV7bP7RRRCARXQxsCmsWiKLXqGtMBOgDVOFRYzCAfNe/OrRyFyor5ESgvvC+QWEqOA==}
+  /ky@1.2.2:
+    resolution: {integrity: sha512-gYA2QOI3uIaImJPJjaBbLCdvKHzwxsuB03s7PjrXmoO6tcn6k53rwYoSRgqrmVsEV6wFFegOXDVjABxFZ0aRSg==}
     engines: {node: '>=18'}
     dev: true
 
@@ -1154,6 +1164,10 @@ packages:
 
   /safe-buffer@5.2.1:
     resolution: {integrity: sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==}
+    dev: true
+
+  /safe-eval@0.4.1:
+    resolution: {integrity: sha512-wmiu4RSYVZ690RP1+cv/LxfPK1dIlEN35aW7iv4SMYdqDrHbkll4+NJcHmKm7PbCuI1df1otOcPwgcc2iFR85g==}
     dev: true
 
   /safe-stable-stringify@2.4.3:

@@ -1,7 +1,8 @@
 import path from "path";
 import fs from "fs-extra";
-
+import { SingleBar } from "cli-progress";
 import axios from "axios";
+
 import { mergeM3U8 } from "../utils/ffmpeg";
 import { downloadHLS, sanitizeFileName, convert2Xml } from "../utils/index";
 import {
@@ -244,16 +245,36 @@ const getStream = async (data: string, streamType?: string) => {
  */
 const saveVideo = async (url: string, output: string) => {
   const tempDir = `${output}-temp`;
-  const hls = await downloadHLS(url, tempDir, {
-    concurrency: 10,
-    retry: { limit: 2 },
-    overwrite: true,
+
+  // 创建进度条实例
+  const progressBar = new SingleBar({
+    format: "下载进度 |{bar}| {percentage}% | ETA: {eta}s",
+    barCompleteChar: "\u2588",
+    barIncompleteChar: "\u2591",
+    hideCursor: true,
   });
-  console.log(hls);
+  progressBar.start(100, 0);
+  const hls = await downloadHLS(
+    url,
+    tempDir,
+    {
+      concurrency: 10,
+      retry: { limit: 2 },
+      overwrite: true,
+    },
+    data => {
+      const percentage = Math.floor((data.count / data.total) * 100);
+      progressBar.update(percentage);
+    }
+  );
+  progressBar.stop();
+
   if (hls.errors && hls.errors.length > 0) {
     await fs.remove(tempDir);
     throw new Error("下载失败");
   }
+  progressBar.update(100);
+
   const m3u8Path = new URL(url).pathname;
   const m3u8File = `${path.join(tempDir, m3u8Path)}`;
   const m3u8NewFile = `${m3u8File}.new.m3u8`;

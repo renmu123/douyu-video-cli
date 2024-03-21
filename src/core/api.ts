@@ -1,6 +1,7 @@
 import axios from "axios";
-// @ts-ignore
 import CryptoJS from "crypto-js";
+// @ts-ignore
+import safeEval from "safe-eval";
 
 import type { Video } from "../types/index";
 import { parseScript, parseFunctionName } from "../utils/index";
@@ -134,8 +135,11 @@ export async function parseVideo(videoId: string): Promise<Video> {
         // 第三个参数: 时间戳 parseInt((new Date).getTime() / 1e3, 10)
         const s = Math.floor(new Date().getTime() / 1e3);
         // 加密后的字符串参数
-        const p = eval(
-          `${decodeScript};${decodeFuction}(${pointId}, "${did}", ${s})`
+        const p = safeEval(
+          `(function func(){${decodeScript};return ${decodeFuction}(${pointId}, "${did}", ${s})})()`,
+          {
+            CryptoJS: CryptoJS,
+          }
         );
         // 最终参数
         const t = `${p}&vid=${videoId}`;

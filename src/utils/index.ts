@@ -37,12 +37,22 @@ export const downloadHLS = async (
     concurrency?: number;
     overwrite?: boolean;
     retry: { limit: number };
-  }
+  },
+  onData?: (data: { count: number; total: number }) => void
 ) => {
+  let count = 0;
   const downloader = new HLSDownloader({
     playlistURL: url,
     destination: filePath,
     ...options,
+    onData: function (data: { item: string; total: number; path: string }) {
+      count += 1;
+      onData &&
+        onData({
+          count,
+          total: data.total,
+        });
+    },
   });
   return downloader.startDownload();
 };
