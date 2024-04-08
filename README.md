@@ -1,13 +1,13 @@
 # 简介
 
-用于下载斗鱼视频录播以及弹幕，支持订阅，自动下载，自动上传。  
+用于下载斗鱼视频录播以及弹幕，支持订阅，自动下载，支持调用 [biliLive-tools](https://github.com/renmu123/biliLive-tools) 自动上传。  
 [视频简介](https://www.bilibili.com/video/BV1tJ4m1a7GQ/)
 
 # 安装
 
 `npm install -g douyu-cli`
 
-该程序依赖于`ffmpeg`，需要手动安装，程序默认会调用环境变量中的`ffmpeg`，如果想自定于或者无法调用，请使用`douyu config set ffmpegBinPath xxxx`手动设置可执行文件地址。
+该程序依赖于[`ffmpeg`](https://github.com/BtbN/FFmpeg-Builds/releases)，需要手动安装，程序默认会调用环境变量中的`ffmpeg`，如果想自定义或者无法调用，请使用`douyu config set ffmpegBinPath xxxx`手动设置可执行文件地址。
 
 # 使用
 
