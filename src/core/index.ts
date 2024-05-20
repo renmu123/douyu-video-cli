@@ -13,7 +13,7 @@ import {
   getReplayList,
 } from "./api";
 import up from "./up";
-import { readConfig, readData, pushData, deleteData } from "./config";
+import { readData, pushData, deleteData } from "./config";
 import logger from "../utils/log";
 
 import type { DanmuItem, Video } from "../types/index";
@@ -102,8 +102,7 @@ export const downloadVideos = async (
   }
 ) => {
   const videoData = await parseVideo(videoId);
-  const config = await readConfig();
-  const downloadDir = opts.dir ?? config.downloadPath;
+  const downloadDir = opts.dir;
 
   if (opts.all) {
     const res = await getVideos(videoId, videoData.ROOM.up_id);

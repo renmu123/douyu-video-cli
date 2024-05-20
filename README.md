@@ -83,7 +83,7 @@ title: 分 p 标题
 username: 用户名
 
 ```bash
-curl --location 'http://127.0.0.1:18010/custom' \
+curl --location 'http://127.0.0.1:18010/webhook/custom' \
 --header 'Content-Type: application/json' \
 --data '{
     "event":"FileOpening",

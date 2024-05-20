@@ -47,6 +47,8 @@ program
       }
     ) => {
       const videoId = parseVideoId(url);
+      const config = await readConfig();
+      opts.dir = opts.dir ?? config.downloadPath;
       const downloader = await downloadVideos(videoId, opts);
     }
   );
@@ -63,7 +65,7 @@ subscribeSubCommand
   .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
   .option("--dir", "下载目录")
   .option("-w, --webhook", "使用webhook")
-  .option("--url", "webhook地址", "http://127.0.0.1:18010/custom")
+  .option("--url", "webhook地址", "http://127.0.0.1:18010/webhook/custom")
   .option("-nv, --no-video", "不下载视频")
   .action(
     async (options: {
@@ -77,8 +79,9 @@ subscribeSubCommand
     }) => {
       // TODO:模板支持
       const config = await readConfig();
-      const downloadPath = options.dir ?? config.downloadPath;
-      logger.info(`开始下载订阅，视频将会被保存在${downloadPath}文件中`);
+      options.dir = options.dir ?? config.downloadPath;
+
+      logger.info(`开始下载订阅，视频将会被保存在${options.dir}文件中`);
       subscribe(options);
     }
   );

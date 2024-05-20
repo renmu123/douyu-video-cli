@@ -1,3 +1,8 @@
+# 0.4.0
+
+1. webhook url 的默认值由 `http://127.0.0.1:18010/custom` 变为 `http://127.0.0.1:18010/webhook/custom`
+2. 将 config 相关配置从 core 中抽离
+
 # 0.3.0
 
 1. 添加下载进度条
