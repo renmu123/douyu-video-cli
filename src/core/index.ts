@@ -300,3 +300,10 @@ export async function saveDanmu(vid: string, output: string, rewrite = false) {
   await fs.writeFile(output, convert2Xml(items));
   return items;
 }
+
+export default {
+  getStream,
+  getStreamUrls,
+  saveDanmu,
+  downloadVideo,
+};

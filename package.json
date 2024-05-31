@@ -4,6 +4,8 @@
   "description": "斗鱼视频下载CLI",
   "homepage": "https://github.com/renmu123/douyu-video-cli",
   "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "scripts": {
     "dev": "rollup --config rollup-dev.config.js -w",
     "build": "rollup --config rollup-dev.config.js",
@@ -27,10 +29,10 @@
     "node": ">=18"
   },
   "bin": {
-    "douyu": "bin/command.js"
+    "douyu": "dist/command.js"
   },
   "files": [
-    "bin"
+    "dist"
   ],
   "dependencies": {
     "axios": "^1.7.0"

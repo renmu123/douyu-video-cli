@@ -6,17 +6,30 @@ import json from "@rollup/plugin-json";
 export default [
   {
     external: ["axios"],
-    input: "src/command/index.ts",
+    input: "src/index.ts",
     output: [
       {
-        file: "bin/command.js",
+        file: "dist/index.js",
         format: "es",
         exports: "named",
       },
-      // {
-      //   file: "bin/command.cjs",
-      //   format: "cjs",
-      // },
+    ],
+    plugins: [
+      typescript(),
+      nodeResolve({ browser: false }),
+      commonjs(),
+      json(),
+    ],
+  },
+  {
+    external: ["axios"],
+    input: "src/command/index.ts",
+    output: [
+      {
+        file: "dist/command.js",
+        format: "es",
+        exports: "named",
+      },
     ],
     plugins: [
       typescript(),
