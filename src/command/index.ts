@@ -63,7 +63,7 @@ subscribeSubCommand
   .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
   .option("--dir", "下载目录")
   .option("-w, --webhook", "使用webhook")
-  .option("--url", "webhook地址", "http://127.0.0.1:18010/custom")
+  .option("--url <string>", "webhook地址", "http://127.0.0.1:18010/custom")
   .option("-nv, --no-video", "不下载视频")
   .action(
     async (options: {
@@ -117,7 +117,7 @@ subscribeSubCommand
   .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
   .option("--dir", "下载目录")
   .option("-w, --webhook", "使用webhook")
-  .option("--url", "webhook地址", "http://127.0.0.1:18010/custom")
+  .option("--url <string>", "webhook地址", "http://127.0.0.1:18010/custom")
   .option("-nv, --no-video", "不下载视频")
   .action(
     async (options: {
@@ -137,7 +137,6 @@ subscribeSubCommand
           interval = Number(options.interval);
         }
       }
-
       subscribe(options);
       setInterval(() => {
         try {
