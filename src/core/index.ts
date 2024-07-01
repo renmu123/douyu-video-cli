@@ -271,6 +271,7 @@ const saveVideo = async (url: string, output: string) => {
 
   if (hls.errors && hls.errors.length > 0) {
     await fs.remove(tempDir);
+    logger.error(`下载失败`, hls.errors);
     throw new Error("下载失败");
   }
   progressBar.update(100);
