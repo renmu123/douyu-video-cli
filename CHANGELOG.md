@@ -3,6 +3,10 @@
 1. webhook url 的默认值由 `http://127.0.0.1:18010/custom` 变为 `http://127.0.0.1:18010/webhook/custom`
 2. 将 config 相关配置从 core 中抽离
 
+# 0.3.2
+
+1. 修复由于打包引发的 bug
+
 # 0.3.1
 
 1. 修复 webhook url 无法配置的 bug

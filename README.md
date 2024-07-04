@@ -3,6 +3,8 @@
 用于下载斗鱼视频录播以及弹幕，支持订阅，自动下载，支持调用 [biliLive-tools](https://github.com/renmu123/biliLive-tools) 自动上传。  
 [视频简介](https://www.bilibili.com/video/BV1tJ4m1a7GQ/)
 
+**node>=20**
+
 # 安装
 
 `npm install -g douyu-cli`
@@ -130,7 +132,7 @@ curl --location 'http://127.0.0.1:18010/webhook/custom' \
 
 # 开发
 
-node>=18
+node>=20
 
 ## Install
 
