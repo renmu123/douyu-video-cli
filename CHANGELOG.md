@@ -1,7 +1,11 @@
+# 0.5.0
+
+1. 将 config 相关配置从 core 中抽离
+2. 导出通用函数
+
 # 0.4.0
 
-1. webhook url 的默认值由 `http://127.0.0.1:18010/custom` 变为 `http://127.0.0.1:18010/webhook/custom`
-2. 将 config 相关配置从 core 中抽离
+1. webhook 的默认值修改为`http://127.0.0.1:18010/webhook/custom`
 
 # 0.3.2
 
