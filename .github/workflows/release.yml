@@ -1,0 +1,76 @@
+name: Build/release Electron app
+
+on:
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    env:
+      is_tag: ${{ startsWith(github.ref, 'refs/tags/') }}
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: build
+        run: pnpm run build:win
+
+      - name: release
+        if: env.is_tag == 'true'
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          draft: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifactErrorsFailBuild: false
+          artifacts: "*.exe"
+          replacesArtifacts: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload win artifact
+        if: startsWith(matrix.os, 'windows') && env.is_tag == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows
+          path: |
+            *.exe
+
+permissions:
+  contents: write
