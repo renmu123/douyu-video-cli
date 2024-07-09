@@ -29,7 +29,7 @@
     "node": ">=18"
   },
   "bin": {
-    "douyu": "dist/command.js"
+    "douyu": "dist/command.mjs"
   },
   "files": [
     "dist"

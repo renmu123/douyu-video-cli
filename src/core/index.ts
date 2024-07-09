@@ -307,4 +307,5 @@ export default {
   getStreamUrls,
   saveDanmu,
   downloadVideo,
+  parseVideo,
 };

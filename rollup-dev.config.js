@@ -9,7 +9,7 @@ export default [
     input: "src/index.ts",
     output: [
       {
-        file: "dist/index.js",
+        file: "dist/index.mjs",
         format: "es",
         exports: "named",
       },
@@ -26,7 +26,7 @@ export default [
     input: "src/command/index.ts",
     output: [
       {
-        file: "dist/command.js",
+        file: "dist/command.mjs",
         format: "es",
         exports: "named",
       },
