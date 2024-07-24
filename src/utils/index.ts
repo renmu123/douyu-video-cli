@@ -128,7 +128,9 @@ export function convert2Xml(data: DanmuItem[]) {
       "@@ctime": String(ele.sts),
       "@@pool": String(0),
       "@@weight": String(0),
-      "@@idStr": String(ele.vid),
+      "@@idStr": String(ele?.uid),
+      "@@user": String(ele.nn),
+      "@@uid": String(ele?.uid),
     };
     data["@@p"] = [
       data["@@progress"],
@@ -138,7 +140,7 @@ export function convert2Xml(data: DanmuItem[]) {
       data["@@ctime"],
       data["@@pool"],
       data["@@midHash"],
-      data["@@idStr"],
+      data["@@uid"],
       data["@@weight"],
     ].join(",");
     return data;
