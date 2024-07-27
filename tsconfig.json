@@ -3,9 +3,8 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": ".",
-    "inlineSourceMap": true,
-    "inlineSources": true,
-    "module": "Node16",
+    "inlineSourceMap": false,
+    "module": "nodenext",
     "target": "es2022",
     "downlevelIteration": true,
     "allowJs": false,
@@ -17,7 +16,8 @@
     "emitDecoratorMetadata": false,
     "experimentalDecorators": true,
     "declaration": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   },
-  "include": ["**/*.ts", "**/*"]
+  "include": ["src/**/*.ts", "src/**/*"]
 }

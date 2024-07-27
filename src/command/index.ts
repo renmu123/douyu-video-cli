@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command } from "commander";
-import { version } from "../../package.json";
+import pkg from "../../package.json" assert { type: "json" };
 import up from "../core/up.js";
 import { downloadVideos, saveDanmu, subscribe } from "../core/index.js";
 import { readConfig, writeConfig } from "../core/config.js";
@@ -19,7 +19,7 @@ process.on("uncaughtException", err => {
 });
 
 const program = new Command();
-program.name("douyu").description("斗鱼视频下载命令行").version(version);
+program.name("douyu").description("斗鱼视频下载命令行").version(pkg.version);
 
 program
   .command("download [url]")

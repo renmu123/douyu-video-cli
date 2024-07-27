@@ -242,8 +242,8 @@ const getStream = async (data: string, streamType?: streamType) => {
 /**
  * 保存并合并视频流
  */
-const saveVideo = async (url: string, output: string) => {
-  const tempDir = `${output}-temp`;
+const saveVideo = async (url: string, output: string, tempDir?: string) => {
+  tempDir = tempDir ?? `${output}-temp`;
 
   // 创建进度条实例
   const progressBar = new SingleBar({
@@ -304,8 +304,9 @@ export async function saveDanmu(vid: string, output: string, rewrite = false) {
 
 export default {
   getStream,
-  getStreamUrls,
   saveDanmu,
   downloadVideo,
-  parseVideo,
+  downloadHLS,
+  modifyM3U8,
+  mergeM3U8,
 };

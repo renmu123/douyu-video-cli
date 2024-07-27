@@ -45,12 +45,16 @@ export const downloadHLS = async (
     playlistURL: url,
     destination: filePath,
     ...options,
-    onData: function (data: { item: string; total: number; path: string }) {
+    onData: function (data: {
+      item: string;
+      totalItems: number;
+      path: string;
+    }) {
       count += 1;
       onData &&
         onData({
           count,
-          total: data.total,
+          total: data.totalItems,
         });
     },
   });

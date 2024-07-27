@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    // "composite": true,
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "module": "nodenext",
+    "target": "es2022",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "esModuleInterop": true,
+    "declaration": false
+  },
+  "include": ["test/**/*.ts", "src/**/*.ts"]
+}
