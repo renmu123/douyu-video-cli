@@ -13,6 +13,8 @@ export interface DanmuItem {
   mid: string;
   /** vid */
   vid: string;
+  /** uid */
+  uid: string;
 }
 
 export interface Video {
