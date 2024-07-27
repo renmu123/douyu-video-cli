@@ -2,7 +2,7 @@ import os from "node:os";
 import path from "node:path";
 import fs from "fs-extra";
 
-import type { Config } from "../types/index";
+import type { Config } from "../types/index.js";
 
 export const appPath = path.join(os.homedir(), ".douyu-video-cli");
 export const configPath = path.join(appPath, "config.json");

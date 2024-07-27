@@ -5,7 +5,7 @@ import { finished } from "stream/promises";
 import HLSDownloader from "hlsdownloader";
 import { XMLBuilder } from "fast-xml-parser";
 
-import type { DanmuItem } from "../types/index";
+import type { DanmuItem } from "../types/index.js";
 
 export function sanitizeFileName(fileName: string) {
   // 定义不允许出现在文件名中的字符

@@ -1,6 +1,6 @@
 import winston from "winston";
 
-import { logPath, readConfig } from "../core/config";
+import { logPath, readConfig } from "../core/config.js";
 
 const { combine, timestamp, printf } = winston.format;
 const myFormat = printf(({ level, message, timestamp }) => {

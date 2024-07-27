@@ -2,9 +2,9 @@ import axios from "axios";
 import CryptoJS from "crypto-js";
 // @ts-ignore
 import safeEval from "safe-eval";
+import { parseScript, parseFunctionName } from "../utils/index.js";
 
-import type { Video } from "../types/index";
-import { parseScript, parseFunctionName } from "../utils/index";
+import type { Video, streamType } from "../types/index.js";
 
 // @ts-ignore
 global.CryptoJS = CryptoJS;
@@ -52,7 +52,7 @@ export async function getStreamUrls(data: string): Promise<{
       fsize: number;
       bit_rate: number;
       name: string;
-      stream_type: "normal";
+      stream_type: streamType;
       level: number;
       stream_format: "264";
       now_free: number;

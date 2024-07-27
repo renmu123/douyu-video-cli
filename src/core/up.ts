@@ -1,5 +1,5 @@
-import { readConfig, writeConfig } from "./config";
-import { getRoomInfo, getFishBarId } from "./api";
+import { readConfig, writeConfig } from "./config.js";
+import { getRoomInfo, getFishBarId } from "./api.js";
 
 const subscribe = async (roomId: number) => {
   const config = await readConfig();

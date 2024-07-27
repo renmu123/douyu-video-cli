@@ -47,3 +47,5 @@ export interface Config {
   ffmpegBinPath: string;
   logLevel: string;
 }
+
+export type streamType = "1440p60a" | "1080p60" | "high" | "normal";

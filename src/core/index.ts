@@ -3,20 +3,20 @@ import fs from "fs-extra";
 import { SingleBar } from "cli-progress";
 import axios from "axios";
 
-import { mergeM3U8 } from "../utils/ffmpeg";
-import { downloadHLS, sanitizeFileName, convert2Xml } from "../utils/index";
+import { mergeM3U8 } from "../utils/ffmpeg.js";
+import { downloadHLS, sanitizeFileName, convert2Xml } from "../utils/index.js";
 import {
   getDanmu,
   getStreamUrls,
   getVideos,
   parseVideo,
   getReplayList,
-} from "./api";
-import up from "./up";
-import { readData, pushData, deleteData } from "./config";
-import logger from "../utils/log";
+} from "./api.js";
+import up from "./up.js";
+import { readData, pushData, deleteData } from "./config.js";
+import logger from "../utils/log.js";
 
-import type { DanmuItem, Video } from "../types/index";
+import type { DanmuItem, Video, streamType } from "../types/index.js";
 
 const modifyM3U8 = async (m3u8File: string, outputFile: string) => {
   const data = await fs.readFile(m3u8File);
@@ -41,7 +41,7 @@ export const subscribe = async (options: {
   danmaku?: boolean;
   webhook?: boolean;
   url?: string;
-  streamType?: string;
+  streamType?: streamType;
   dir?: string;
   video?: boolean;
 }) => {
@@ -92,7 +92,7 @@ export const downloadVideos = async (
     rewrite?: boolean;
     url?: string;
     webhook?: boolean;
-    streamType?: string;
+    streamType?: streamType;
     dir?: string;
     video?: boolean;
   } = {
@@ -202,7 +202,7 @@ export const downloadVideo = async (
   output: string,
   opts: {
     rewrite?: boolean;
-    streamType?: string;
+    streamType?: "1440p60a" | "1080p60" | "high" | "normal";
   }
 ) => {
   if (!opts.rewrite && (await fs.pathExists(output))) {
@@ -218,7 +218,7 @@ export const downloadVideo = async (
 /**
  * 获取最高清晰度的视频流
  */
-const getStream = async (data: string, streamType?: string) => {
+const getStream = async (data: string, streamType?: streamType) => {
   const res = await getStreamUrls(data);
   const streams = Object.values(res.thumb_video);
   if (streams.length === 0) {

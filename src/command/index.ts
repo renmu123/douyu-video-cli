@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import { version } from "../../package.json";
-import up from "../core/up";
-import { downloadVideos, saveDanmu, subscribe } from "../core/index";
-import { readConfig, writeConfig } from "../core/config";
-import { parseVideoId } from "../utils/index";
-import logger from "../utils/log";
+import up from "../core/up.js";
+import { downloadVideos, saveDanmu, subscribe } from "../core/index.js";
+import { readConfig, writeConfig } from "../core/config.js";
+import { parseVideoId } from "../utils/index.js";
+import logger from "../utils/log.js";
 
 import type { Logger } from "winston";
-import type { Config } from "../types/index";
+import type { Config, streamType } from "../types/index.js";
 
 declare global {
   var logger: Logger;
@@ -39,7 +39,7 @@ program
         all?: boolean;
         danmaku?: boolean;
         rewrite?: boolean;
-        streamType?: string;
+        streamType?: streamType;
         dir?: string;
         webhook?: boolean;
         url?: string;
@@ -77,7 +77,7 @@ subscribeSubCommand
       danmaku?: boolean;
       webhook?: boolean;
       url?: string;
-      streamType?: string;
+      streamType?: streamType;
       dir?: string;
       video?: boolean;
     }) => {
