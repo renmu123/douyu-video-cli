@@ -1,51 +1,91 @@
+import os from "node:os";
 import fs from "fs-extra";
 import path from "node:path";
+import { exec } from "node:child_process";
+import { EventEmitter } from "node:events";
 
 import axios from "axios";
 import axiosRetry from "axios-retry";
-
-import { EventEmitter } from "events";
 import PQueue from "p-queue";
-import { exec } from "child_process";
-import * as m3u8Parser from "m3u8-parser";
-
-// http://play2-tx-recpub.douyucdn2.cn/live/1440p60a_live-93589rLwddnkoZwx--20240727132643/playlist.m3u8?tlink=66a4c6bb&tplay=66a5535b&exper=0&nlimit=5&us=d6122a55e9f2d9ff39d9092800001701&sign=3e40bc9366e5fbce6cb07c7bfc008c7d&u=0&d=d6122a55e9f2d9ff39d9092800001701&ct=web&vid=41710087&pt=2&cdn=tx
 
 export default class M3U8Downloader extends EventEmitter {
   private m3u8Url: string;
-  private outputDir: string;
+  output: string;
+  private tempDir: string;
   private queue: PQueue;
   private totalSegments: number;
   private downloadedSegments: number;
-  private isPaused: boolean;
+  isPaused: boolean;
+  private options: {
+    concurrency: number;
+    convert2Mp4: boolean;
+    tempDir: string;
+    ffmpegPath: string;
+    retries: number;
+  };
 
-  constructor(m3u8Url: string, outputDir: string, concurrency: number = 5) {
+  /**
+   * @param m3u8Url M3U8 URL
+   * @param options
+   * @param options.concurrency Number of segments to download concurrently
+   * @param options.tempDir Temporary directory to store downloaded segments
+   * @param options.convert2Mp4 Whether to convert2Mp4 downloaded segments into a single file
+   * @param options.ffmpegPath Path to ffmpeg binary
+   * @param options.retries Number of retries for downloading segments
+   */
+  constructor(
+    m3u8Url: string,
+    output: string,
+    options: {
+      concurrency?: number;
+      tempDir?: string;
+      convert2Mp4?: boolean;
+      ffmpegPath?: string;
+      retries?: number;
+    } = {}
+  ) {
     super();
+    const defaultOptions = {
+      concurrency: 5,
+      convert2Mp4: false,
+      tempDir: os.tmpdir(),
+      retries: 3,
+      ffmpegPath: "ffmpeg",
+    };
+    this.options = Object.assign(defaultOptions, options);
     this.m3u8Url = m3u8Url;
-    this.outputDir = outputDir;
-    this.queue = new PQueue({ concurrency });
+    this.output = output;
+    this.tempDir = this.options.tempDir;
+    this.queue = new PQueue({ concurrency: this.options.concurrency });
     this.totalSegments = 0;
     this.downloadedSegments = 0;
     this.isPaused = false;
 
-    axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
+    axiosRetry(axios, {
+      retries: this.options.retries,
+      retryDelay: axiosRetry.exponentialDelay,
+    });
   }
 
   public async download() {
     try {
       this.emit("start");
-      if (!(await fs.pathExists(this.outputDir))) {
-        await fs.mkdir(this.outputDir);
+      if (!(await fs.pathExists(this.tempDir))) {
+        await fs.mkdir(this.tempDir);
+      }
+      if (!(await fs.pathExists(path.dirname(this.output)))) {
+        throw new Error("Output directory does not exist");
       }
       const m3u8Content = await this.downloadM3U8();
       const tsUrls = this.parseM3U8(m3u8Content);
-      console.log(tsUrls.length);
       this.totalSegments = tsUrls.length;
 
-      // await this.downloadTsSegments(tsUrls);
-      // this.mergeTsSegments(tsUrls);
+      await this.downloadTsSegments(tsUrls);
+      const tsMediaPath = this.mergeTsSegments(tsUrls);
 
-      // this.convertToMp4();
+      if (this.options.convert2Mp4) {
+        this.convertToMp4(tsMediaPath);
+      }
 
       this.emit("complete");
     } catch (error) {
@@ -92,10 +132,13 @@ export default class M3U8Downloader extends EventEmitter {
         const response = await axios.get(tsUrl, {
           responseType: "arraybuffer",
         });
-        const segmentPath = path.resolve(this.outputDir, `segment${index}.ts`);
-        fs.writeFileSync(segmentPath, response.data);
+        const segmentPath = path.resolve(this.tempDir, `segment${index}.ts`);
+        await fs.writeFile(segmentPath, response.data);
         this.downloadedSegments++;
-        this.emit("progress", this.downloadedSegments, this.totalSegments);
+        this.emit("progress", {
+          downloaded: this.downloadedSegments,
+          total: this.totalSegments,
+        });
         this.emit("segmentDownloaded", index, tsUrls.length);
       } catch (error) {
         this.emit("error", `Failed to download segment ${index}`);
@@ -115,11 +158,15 @@ export default class M3U8Downloader extends EventEmitter {
   }
 
   private mergeTsSegments(tsUrls: string[]) {
-    const mergedFilePath = path.resolve(this.outputDir, "output.ts");
+    let mergedFilePath = path.resolve(this.tempDir, "output.ts");
+
+    if (!this.options.convert2Mp4) {
+      mergedFilePath = this.output;
+    }
     const writeStream = fs.createWriteStream(mergedFilePath);
 
     tsUrls.forEach((_, index) => {
-      const segmentPath = path.resolve(this.outputDir, `segment${index}.ts`);
+      const segmentPath = path.resolve(this.tempDir, `segment${index}.ts`);
       if (fs.existsSync(segmentPath)) {
         const segmentData = fs.readFileSync(segmentPath);
         writeStream.write(segmentData);
@@ -130,14 +177,15 @@ export default class M3U8Downloader extends EventEmitter {
     });
 
     writeStream.end();
+    return mergedFilePath;
   }
 
-  private convertToMp4() {
-    const inputFilePath = path.resolve(this.outputDir, "output.ts");
-    const outputFilePath = path.resolve(this.outputDir, "output.mp4");
+  private convertToMp4(tsMediaPath: string) {
+    const inputFilePath = tsMediaPath;
+    const outputFilePath = this.output;
 
     exec(
-      `ffmpeg -i ${inputFilePath} -c copy ${outputFilePath}`,
+      `"${this.options.ffmpegPath}" -i "${inputFilePath}" -c copy "${outputFilePath}"`,
       (error, stdout, stderr) => {
         if (error) {
           this.emit("error", `Failed to convert to MP4: ${stderr}`);
@@ -148,4 +196,31 @@ export default class M3U8Downloader extends EventEmitter {
       }
     );
   }
+  // private convertToMp4(tsMediaPath: string) {
+  //   const input = tsMediaPath;
+  //   const outputFilepath = this.output;
+
+  //   return new Promise((resolve, reject) => {
+  //     let args = ["-hide_banner", "-loglevel", "error"];
+
+  //     args = [...args, "-i", input, "-c", "copy", "-y", outputFilepath];
+  //     // console.log(`${ffmpegBinPath} ${args.join(" ")}`);
+  //     const ffmpeg = spawn(this.options.ffmpegPath, args);
+
+  //     ffmpeg.stdout.pipe(process.stdout);
+
+  //     ffmpeg.stderr.pipe(process.stderr);
+
+  //     ffmpeg.on("close", code => {
+  //       if (code === 0) {
+  //         this.emit("converted", outputFilepath);
+  //         resolve(true);
+  //       } else {
+  //         this.emit("error", `Failed to convert to MP4: ${code}`);
+  //         fs.unlinkSync(input);
+  //         reject(false);
+  //       }
+  //     });
+  //   });
+  // }
 }
