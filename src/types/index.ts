@@ -32,8 +32,11 @@ export interface Video {
       start_time: number;
       video_duration: number;
     };
+    liveShow: {};
   };
-  decode: (videoId: string) => string;
+  /** 用于获取视频流 */
+  decodeData: string;
+  seo_title: string;
 }
 
 export interface Config {

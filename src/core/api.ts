@@ -4,19 +4,15 @@ import CryptoJS from "crypto-js";
 import safeEval from "safe-eval";
 import { parseScript, parseFunctionName } from "../utils/index.js";
 
-import type { Video, streamType } from "../types/index.js";
+import type { Video, streamType, DanmuItem } from "../types/index.js";
 
 // @ts-ignore
 global.CryptoJS = CryptoJS;
 
 /**
- * 获取视频弹幕
+ * 获取原始视频弹幕
  */
-export async function getDanmu(
-  vid: string,
-  startTime: number,
-  endTime: number = -1
-) {
+async function getDanmu(vid: string, startTime: number, endTime: number = -1) {
   const url = "https://v.douyu.com/wgapi/vod/center/getBarrageList";
   const res = await axios.get(url, {
     params: {
@@ -26,6 +22,22 @@ export async function getDanmu(
     },
   });
   return res.data;
+}
+
+/**
+ * 获取视频所有弹幕
+ */
+export async function getVideoDanmu(vid: string) {
+  const items: DanmuItem[] = [];
+  let startTime = 0;
+
+  while (startTime !== -1) {
+    const res = await getDanmu(vid, startTime);
+    startTime = res.data.end_time;
+    const list: any[] = res.data.list;
+    items.push(...list);
+  }
+  return items;
 }
 
 /**
@@ -107,11 +119,33 @@ export async function getVideos(
   return response.data.data;
 }
 
+const decode = (response: any, data: any) => {
+  const scripts = parseScript(response.data);
+  const decodeScript = scripts.at(-2);
+  const decodeFuction = parseFunctionName(decodeScript)[0];
+  const pointId = data.ROOM.point_id;
+  // 第二个参数: 从cookie中获取，试试看使用固定值
+  const did = "d6122a55e9f2d9ff39d9092800001701";
+  // 第三个参数: 时间戳 parseInt((new Date).getTime() / 1e3, 10)
+  const s = Math.floor(new Date().getTime() / 1e3);
+  // 加密后的字符串参数
+  const p = safeEval(
+    `(function func(){${decodeScript};return ${decodeFuction}(${pointId}, "${did}", ${s})})()`,
+    {
+      CryptoJS: CryptoJS,
+    }
+  );
+  // 最终参数
+  const t = `${p}&vid=${data.ROOM.vid}`;
+
+  return t;
+};
+
 /**
  * 解析视频页
  */
-export async function parseVideo(videoId: string): Promise<Video> {
-  const response = await axios.get(`https://v.douyu.com/show/${videoId}`);
+export async function parseVideo(url: string): Promise<Video> {
+  const response = await axios.get(url);
   const regex = /window\.\$DATA\s*=\s*({.*?});/s;
   // Match the regular expression in the HTML
   const match = response.data.match(regex);
@@ -121,31 +155,10 @@ export async function parseVideo(videoId: string): Promise<Video> {
     const jsonDataString = match[1];
     // console.log("jsonDataString", eval("(" + jsonDataString + ")"));
     const data = eval("(" + jsonDataString + ")");
-
-    const scripts = await parseScript(response.data);
-    const decodeScript = scripts.at(-2);
-    const decodeFuction = parseFunctionName(decodeScript)[0];
-
+    const decodeData = decode(response, data);
     return {
       ...data,
-      decode: (videoId: string) => {
-        const pointId = data.ROOM.point_id;
-        // 第二个参数: 从cookie中获取，试试看使用固定值
-        const did = "d6122a55e9f2d9ff39d9092800001701";
-        // 第三个参数: 时间戳 parseInt((new Date).getTime() / 1e3, 10)
-        const s = Math.floor(new Date().getTime() / 1e3);
-        // 加密后的字符串参数
-        const p = safeEval(
-          `(function func(){${decodeScript};return ${decodeFuction}(${pointId}, "${did}", ${s})})()`,
-          {
-            CryptoJS: CryptoJS,
-          }
-        );
-        // 最终参数
-        const t = `${p}&vid=${videoId}`;
-
-        return t;
-      },
+      decodeData,
     };
   } else {
     throw new Error("JSON data not found in the HTML.");

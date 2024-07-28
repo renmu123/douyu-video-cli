@@ -180,7 +180,7 @@ export function parseFunctionName(html: string): string[] {
 /**
  * 解析script标签
  */
-export async function parseScript(html: string): Promise<string[]> {
+export function parseScript(html: string): string[] {
   var scriptRegex = /<script\b[^>]*>([\s\S]*?)<\/script>/g;
   var match;
   var scripts = [];

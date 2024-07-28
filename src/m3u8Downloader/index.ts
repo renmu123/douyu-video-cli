@@ -15,7 +15,9 @@ export default class M3U8Downloader extends EventEmitter {
   private queue: PQueue;
   private totalSegments: number;
   private downloadedSegments: number;
-  isPaused: boolean;
+  private isPaused: boolean;
+  private isCanceled: boolean;
+  private downloadedFiles: string[];
   private options: {
     concurrency: number;
     convert2Mp4: boolean;
@@ -60,18 +62,24 @@ export default class M3U8Downloader extends EventEmitter {
     this.totalSegments = 0;
     this.downloadedSegments = 0;
     this.isPaused = false;
+    this.isCanceled = false;
+    this.downloadedFiles = [];
 
     axiosRetry(axios, {
       retries: this.options.retries,
       retryDelay: axiosRetry.exponentialDelay,
     });
+
+    // 监听取消和错误事件
+    this.on("canceled", this.cleanUpDownloadedFiles);
+    this.on("error", this.cleanUpDownloadedFiles);
   }
 
   public async download() {
     try {
       this.emit("start");
       if (!(await fs.pathExists(this.tempDir))) {
-        await fs.mkdir(this.tempDir);
+        await fs.mkdir(this.tempDir, { recursive: true });
       }
       if (!(await fs.pathExists(path.dirname(this.output)))) {
         throw new Error("Output directory does not exist");
@@ -82,27 +90,37 @@ export default class M3U8Downloader extends EventEmitter {
 
       await this.downloadTsSegments(tsUrls);
       const tsMediaPath = this.mergeTsSegments(tsUrls);
+      if (this.isCanceled) return;
 
       if (this.options.convert2Mp4) {
         this.convertToMp4(tsMediaPath);
       }
 
-      this.emit("complete");
+      this.emit("completed");
     } catch (error) {
       this.emit("error", error);
     }
   }
 
   public pause() {
+    if (this.isCanceled) return;
+
     this.queue.pause();
     this.isPaused = true;
     this.emit("paused");
   }
 
   public resume() {
+    if (this.isCanceled) return;
+
     this.queue.start();
     this.isPaused = false;
     this.emit("resumed");
+  }
+  public cancel() {
+    this.isCanceled = true;
+    this.queue.clear(); // 清空队列中的所有任务
+    this.emit("canceled");
   }
 
   async downloadM3U8(): Promise<string> {
@@ -128,12 +146,15 @@ export default class M3U8Downloader extends EventEmitter {
 
   private async downloadTsSegments(tsUrls: string[]) {
     const downloadSegment = async (tsUrl: string, index: number) => {
+      if (this.isCanceled) return;
+
       try {
         const response = await axios.get(tsUrl, {
           responseType: "arraybuffer",
         });
         const segmentPath = path.resolve(this.tempDir, `segment${index}.ts`);
         await fs.writeFile(segmentPath, response.data);
+        this.downloadedFiles.push(segmentPath);
         this.downloadedSegments++;
         this.emit("progress", {
           downloaded: this.downloadedSegments,
@@ -158,6 +179,7 @@ export default class M3U8Downloader extends EventEmitter {
   }
 
   private mergeTsSegments(tsUrls: string[]) {
+    if (this.isCanceled) return;
     let mergedFilePath = path.resolve(this.tempDir, "output.ts");
 
     if (!this.options.convert2Mp4) {
@@ -166,6 +188,8 @@ export default class M3U8Downloader extends EventEmitter {
     const writeStream = fs.createWriteStream(mergedFilePath);
 
     tsUrls.forEach((_, index) => {
+      if (this.isCanceled) return;
+
       const segmentPath = path.resolve(this.tempDir, `segment${index}.ts`);
       if (fs.existsSync(segmentPath)) {
         const segmentData = fs.readFileSync(segmentPath);
@@ -178,6 +202,22 @@ export default class M3U8Downloader extends EventEmitter {
 
     writeStream.end();
     return mergedFilePath;
+  }
+  private async cleanUpDownloadedFiles() {
+    await Promise.all(
+      this.downloadedFiles.map(async file => {
+        if (await fs.pathExists(file)) {
+          await fs.unlink(file);
+        }
+      })
+    );
+    if (this.options.convert2Mp4) {
+      let mergedFilePath = path.resolve(this.tempDir, "output.ts");
+      if (await fs.pathExists(mergedFilePath)) {
+        await fs.unlink(mergedFilePath);
+      }
+    }
+    this.downloadedFiles = [];
   }
 
   private convertToMp4(tsMediaPath: string) {
@@ -196,31 +236,4 @@ export default class M3U8Downloader extends EventEmitter {
       }
     );
   }
-  // private convertToMp4(tsMediaPath: string) {
-  //   const input = tsMediaPath;
-  //   const outputFilepath = this.output;
-
-  //   return new Promise((resolve, reject) => {
-  //     let args = ["-hide_banner", "-loglevel", "error"];
-
-  //     args = [...args, "-i", input, "-c", "copy", "-y", outputFilepath];
-  //     // console.log(`${ffmpegBinPath} ${args.join(" ")}`);
-  //     const ffmpeg = spawn(this.options.ffmpegPath, args);
-
-  //     ffmpeg.stdout.pipe(process.stdout);
-
-  //     ffmpeg.stderr.pipe(process.stderr);
-
-  //     ffmpeg.on("close", code => {
-  //       if (code === 0) {
-  //         this.emit("converted", outputFilepath);
-  //         resolve(true);
-  //       } else {
-  //         this.emit("error", `Failed to convert to MP4: ${code}`);
-  //         fs.unlinkSync(input);
-  //         reject(false);
-  //       }
-  //     });
-  //   });
-  // }
 }

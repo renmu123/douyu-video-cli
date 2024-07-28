@@ -6,7 +6,7 @@ import axios from "axios";
 import { mergeM3U8 } from "../utils/ffmpeg.js";
 import { downloadHLS, sanitizeFileName, convert2Xml } from "../utils/index.js";
 import {
-  getDanmu,
+  getVideoDanmu,
   getStreamUrls,
   getVideos,
   parseVideo,
@@ -82,6 +82,13 @@ export const subscribe = async (options: {
 };
 
 /**
+ * 构建视频页链接
+ */
+const buildVideoUrl = (videoId: string) => {
+  return `https://v.douyu.com/show/${videoId}`;
+};
+
+/**
  * 下载视频
  */
 export const downloadVideos = async (
@@ -101,13 +108,13 @@ export const downloadVideos = async (
     rewrite: false,
   }
 ) => {
-  const videoData = await parseVideo(videoId);
+  const videoData = await parseVideo(buildVideoUrl(videoId));
   const downloadDir = opts.dir;
 
   if (opts.all) {
     const res = await getVideos(videoId, videoData.ROOM.up_id);
     for (const video of res.list) {
-      const videoData = await parseVideo(video.hash_id);
+      const videoData = await parseVideo(buildVideoUrl(video.hash_id));
       const name = sanitizeFileName(video.title);
       const output = path.join(downloadDir, `${name}.mp4`);
       // console.log(JSON.stringify(videoData, null, 2));
@@ -209,8 +216,7 @@ export const downloadVideo = async (
     logger.info(`文件已存在，跳过下载`);
     return;
   }
-  const data = video.decode(video.ROOM.vid);
-  const streamUrl = await getStream(data, opts.streamType);
+  const streamUrl = await getStream(video.decodeData, opts.streamType);
   logger.info(`streamUrl: ${streamUrl}`);
   await saveVideo(streamUrl, output);
 };
@@ -289,15 +295,7 @@ export async function saveDanmu(vid: string, output: string, rewrite = false) {
     logger.info(`文件已存在，跳过下载`);
     return;
   }
-  const items: DanmuItem[] = [];
-  let startTime = 0;
-
-  while (startTime !== -1) {
-    const res = await getDanmu(vid, startTime);
-    startTime = res.data.end_time;
-    const list: any[] = res.data.list;
-    items.push(...list);
-  }
+  const items = await getVideoDanmu(vid);
   await fs.writeFile(output, convert2Xml(items));
   return items;
 }
