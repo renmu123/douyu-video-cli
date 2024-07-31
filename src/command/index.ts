@@ -1,14 +1,21 @@
 #!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { Command } from "commander";
-import pkg from "../../package.json" assert { type: "json" };
 import up from "../core/up.js";
-import { downloadVideos, saveDanmu, subscribe } from "../core/index.js";
+import { downloadVideos, subscribe } from "../core/index.js";
 import { readConfig, writeConfig } from "../core/config.js";
 import { parseVideoId } from "../utils/index.js";
 import logger from "../utils/log.js";
 
 import type { Logger } from "winston";
 import type { Config, streamType } from "../types/index.js";
+
+export const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "../../package.json"), "utf-8")
+);
 
 declare global {
   var logger: Logger;
@@ -19,6 +26,7 @@ process.on("uncaughtException", err => {
 });
 
 const program = new Command();
+
 program.name("douyu").description("斗鱼视频下载命令行").version(pkg.version);
 
 program
