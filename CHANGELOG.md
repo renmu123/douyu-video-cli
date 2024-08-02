@@ -1,3 +1,10 @@
+# 0.6.0
+
+1. 更换下载 hls 下载库为`@renmu/m3u8-downloader`
+2. 移除`download`的`rewrite`选项
+3. 修复老视频无法合并的 bug
+4. 更新 [api 文档](./docs/api.md)
+
 # 0.5.0
 
 1. 重构部分代码

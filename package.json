@@ -1,6 +1,6 @@
 {
   "name": "douyu-cli",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "斗鱼视频下载CLI",
   "homepage": "https://github.com/renmu123/douyu-video-cli",
   "type": "module",
@@ -38,13 +38,13 @@
     "dist"
   ],
   "dependencies": {
+    "@renmu/m3u8-downloader": "^0.2.0",
     "axios": "^1.7.2",
     "cli-progress": "^3.12.0",
     "commander": "^12.1.0",
     "crypto-js": "^4.2.0",
     "fast-xml-parser": "^4.4.0",
     "fs-extra": "^11.2.0",
-    "hlsdownloader": "^3.2.7",
     "safe-eval": "^0.4.1",
     "winston": "^3.13.1"
   },
@@ -57,7 +57,7 @@
     "@types/cli-progress": "^3.11.6",
     "@types/crypto-js": "^4.2.2",
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "22.0.0",
+    "@types/node": "22.1.0",
     "rimraf": "^6.0.1",
     "rollup": "^4.19.0",
     "rollup-plugin-copy": "^3.5.0",

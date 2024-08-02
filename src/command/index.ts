@@ -34,7 +34,6 @@ program
   .description("下载视频")
   .option("-a, --all", "下载所有分p")
   .option("-d, --danmaku", "下载弹幕")
-  .option("-r, --rewrite", "覆盖已有文件")
   .option("--dir", "下载目录")
   .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
   .option("-w, --webhook", "使用webhook")
@@ -46,7 +45,6 @@ program
       opts: {
         all?: boolean;
         danmaku?: boolean;
-        rewrite?: boolean;
         streamType?: streamType;
         dir?: string;
         webhook?: boolean;

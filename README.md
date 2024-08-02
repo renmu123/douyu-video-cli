@@ -9,7 +9,7 @@
 
 `npm install -g douyu-cli`
 
-该程序依赖于[`ffmpeg`](https://github.com/BtbN/FFmpeg-Builds/releases)，需要手动安装，程序默认会调用环境变量中的`ffmpeg`，如果想自定义或者无法调用，请使用`douyu config set ffmpegBinPath xxxx`手动设置可执行文件地址。
+默认视频为 ts 格式，如果想要转换为 mp4，那么你需要手动安装[`ffmpeg`](https://github.com/BtbN/FFmpeg-Builds/releases)并使用`douyu config set ffmpegBinPath xxxx`设置可执行文件地址，如果你已经设置为环境变量，也可以设置为`ffmpeg`。
 
 # 使用
 
@@ -45,7 +45,6 @@ Usage: douyu download [options] [url]
 Options:
   -a, --all      下载所有分p
   -d, --danmaku  下载弹幕
-  -r, --rewrite  覆盖已有文件
   -st, --stream-type 清晰度
   --dir          下载文件夹，会覆盖config中的downloadPath
   -w, -webhook   启用webhook
@@ -127,12 +126,14 @@ curl --location 'http://127.0.0.1:18010/webhook/custom' \
 # 赞赏
 
 如果本项目对你有帮助，请我喝瓶快乐水吧，有助于项目更好维护。  
-爱发电：[https://afdian.net/a/renmu123](https://afdian.net/a/renmu123)  
+爱发电：[https://afdian.com/a/renmu123](https://afdian.com/a/renmu123)  
 你也可以给我的 B 站帐号[充电](https://space.bilibili.com/10995238)
 
 # 开发
 
 node>=20
+
+如果你需要使用一些相关 api 进行二次开发，参考 [api 文档](./docs/api.md)
 
 ## Install
 

@@ -1,5 +1,5 @@
-import douyu from "./core/index.js";
 export * from "./types/index.js";
 export * from "./core/api.js";
+import { convert2Xml } from "./utils/index.js";
 
-export default douyu;
+export { convert2Xml };

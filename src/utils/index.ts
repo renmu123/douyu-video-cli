@@ -1,8 +1,6 @@
 import fs from "fs";
 import { Readable } from "stream";
 import { finished } from "stream/promises";
-// @ts-ignore
-import HLSDownloader from "hlsdownloader";
 import { XMLBuilder } from "fast-xml-parser";
 
 import type { DanmuItem } from "../types/index.js";
@@ -28,37 +26,6 @@ export const downloadFile = async (
   const res = await fetch(url, options);
   const fileStream = fs.createWriteStream(filePath, { flags: "wx" });
   await finished(Readable.fromWeb(res.body).pipe(fileStream));
-};
-
-export const downloadHLS = async (
-  url: string,
-  filePath: string,
-  options?: {
-    concurrency?: number;
-    overwrite?: boolean;
-    retry: { limit: number };
-  },
-  onData?: (data: { count: number; total: number }) => void
-) => {
-  let count = 0;
-  const downloader = new HLSDownloader({
-    playlistURL: url,
-    destination: filePath,
-    ...options,
-    onData: function (data: {
-      item: string;
-      totalItems: number;
-      path: string;
-    }) {
-      count += 1;
-      onData &&
-        onData({
-          count,
-          total: data.totalItems,
-        });
-    },
-  });
-  return downloader.startDownload();
 };
 
 /**
