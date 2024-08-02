@@ -60,8 +60,6 @@
     "@types/node": "22.1.0",
     "rimraf": "^6.0.1",
     "rollup": "^4.19.0",
-    "rollup-plugin-copy": "^3.5.0",
-    "rollup-plugin-dts": "^6.1.1",
     "tslib": "^2.6.3",
     "typescript": "^5.5.4"
   }
