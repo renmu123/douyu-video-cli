@@ -19,17 +19,21 @@ import logger from "../utils/log.js";
 
 import type { Video, streamType } from "../types/index.js";
 
-/**
- * 下载订阅
- */
-export const subscribe = async (options: {
+interface DownloadOptions {
   danmaku?: boolean;
   webhook?: boolean;
   url?: string;
   streamType?: streamType;
   dir?: string;
   video?: boolean;
-}) => {
+  ffmpegBinPath?: string;
+  concurrency?: number;
+}
+
+/**
+ * 下载订阅
+ */
+export const subscribe = async (options: DownloadOptions) => {
   const upList = await up.list();
   const records = (await readData()).map(item => item.videoId);
 
@@ -77,14 +81,8 @@ const buildVideoUrl = (videoId: string) => {
  */
 export const downloadVideos = async (
   videoId: string,
-  opts: {
+  opts: DownloadOptions & {
     all?: boolean;
-    danmaku?: boolean;
-    url?: string;
-    webhook?: boolean;
-    streamType?: streamType;
-    dir?: string;
-    video?: boolean;
   } = {
     all: false,
     danmaku: false,
@@ -140,11 +138,9 @@ export const downloadVideos = async (
       }
     }
   } else {
-    const config = await readConfig();
-
     const name = sanitizeFileName(videoData.ROOM.name);
     let output = path.join(downloadDir, `${name}.mp4`);
-    if (!config.ffmpegBinPath) {
+    if (!opts.ffmpegBinPath) {
       output = path.join(downloadDir, `${name}.ts`);
     }
 
@@ -194,9 +190,7 @@ export const downloadVideos = async (
 export const downloadVideo = async (
   video: Video,
   output: string,
-  opts: {
-    streamType?: "1440p60a" | "1080p60" | "high" | "normal";
-  }
+  opts: DownloadOptions
 ) => {
   if (await fs.pathExists(output)) {
     logger.info(`文件已存在，跳过下载`);
@@ -204,7 +198,7 @@ export const downloadVideo = async (
   }
   const streamUrl = await getStream(video.decodeData, opts.streamType);
   logger.info(`streamUrl: ${streamUrl}`);
-  await saveVideo(streamUrl, output);
+  await saveVideo(streamUrl, output, opts);
 };
 
 /**
@@ -234,7 +228,11 @@ const getStream = async (data: string, streamType?: streamType) => {
 /**
  * 保存并合并视频流
  */
-const saveVideo = async (url: string, output: string) => {
+const saveVideo = async (
+  url: string,
+  output: string,
+  opts: DownloadOptions
+) => {
   // 创建进度条实例
   const progressBar = new SingleBar({
     format: "下载进度 |{bar}| {percentage}% | ETA: {eta}s",
@@ -243,14 +241,18 @@ const saveVideo = async (url: string, output: string) => {
     hideCursor: true,
   });
   progressBar.start(100, 0);
-  const config = await readConfig();
+  const segmentsDir = path.join(
+    path.dirname(output),
+    `${path.parse(output).name}-ts`
+  );
   try {
     await downloadHLS(
       url,
       output,
       {
-        concurrency: 10,
-        ffmpegPath: config.ffmpegBinPath,
+        concurrency: opts.concurrency || 10,
+        ffmpegPath: opts.ffmpegBinPath,
+        segmentsDir,
       },
       data => {
         const percentage = Math.floor((data.downloaded / data.total) * 100);
@@ -258,12 +260,13 @@ const saveVideo = async (url: string, output: string) => {
       }
     );
   } catch (e) {
+    fs.remove(segmentsDir);
     logger.error(`下载失败`, e);
     throw new Error("下载失败");
   }
+  fs.remove(segmentsDir);
   progressBar.stop();
   progressBar.update(100);
-  // output;
 };
 
 export async function saveDanmu(vid: string, output: string) {
@@ -282,16 +285,16 @@ export const downloadHLS = (
   options?: {
     concurrency?: number;
     ffmpegPath?: string;
+    segmentsDir: string;
   },
   onProgress?: (data: { downloaded: number; total: number }) => void
 ) => {
   return new Promise((resolve, reject) => {
     const downloader = new M3U8Downloader(url, filePath, {
-      mergeSegments: true,
-      ffmpegPath: options.ffmpegPath,
-      convert2Mp4: !!options.ffmpegPath,
-      segmentsDir: path.join(os.tmpdir(), "douyu-video-cli"),
       ...options,
+      mergeSegments: true,
+      convert2Mp4: !!options.ffmpegPath,
+      clean: false,
     });
     downloader.on("progress", data => {
       onProgress?.(data);

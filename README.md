@@ -1,6 +1,6 @@
 # 简介
 
-用于下载斗鱼视频录播以及弹幕，支持订阅，自动下载，支持调用 [biliLive-tools](https://github.com/renmu123/biliLive-tools) 自动上传。  
+用于下载斗鱼视频录播以及弹幕，支持订阅，自动下载，支持调用 [biliLive-tools](https://github.com/renmu123/biliLive-tools) 自动上传，如果有不兼容请查看[更新历史](https://github.com/renmu123/douyu-video-cli/blob/main/CHANGELOG.md)。  
 [视频简介](https://www.bilibili.com/video/BV1tJ4m1a7GQ/)
 
 **node>=20**
@@ -9,7 +9,7 @@
 
 `npm install -g douyu-cli`
 
-默认视频为 ts 格式，如果想要转换为 mp4，那么你需要手动安装[`ffmpeg`](https://github.com/BtbN/FFmpeg-Builds/releases)并使用`douyu config set ffmpegBinPath xxxx`设置可执行文件地址，如果你已经设置为环境变量，也可以设置为`ffmpeg`。
+默认视频为 ts 格式，如果想要转换为 mp4，那么你需要手动安装[`ffmpeg`](https://github.com/BtbN/FFmpeg-Builds/releases)，并在下载时指定`ffpath`参数，或者也可以使用`douyu config set ffmpegBinPath xxxx`设置可执行文件地址，如果你已经设置为环境变量，也可以设置为`ffmpeg`。
 
 # 使用
 
@@ -43,14 +43,16 @@ Usage: douyu download [options] [url]
 下载视频
 
 Options:
-  -a, --all      下载所有分p
-  -d, --danmaku  下载弹幕
-  -st, --stream-type 清晰度
-  --dir          下载文件夹，会覆盖config中的downloadPath
-  -w, -webhook   启用webhook
-  --url          webhook地址
-  -nv, --no-video 不下载视频
-  -h, --help     display help for command
+  -a, --all                            下载所有分p
+  -d, --danmaku                        下载弹幕
+  --dir                                下载目录
+  -st, --stream-type <string>          清晰度，默认为最高清晰度
+  -w, --webhook                        使用webhook
+  --url                                webhook地址
+  -nv, --no-video                      不下载视频
+  -ffpath, --ffmpeg-bin-path <string>  ffmpeg路径
+  -conc, --concurrency <number>        下载并发数 (default: 10)
+  -h, --help                           display help for command
 ```
 
 清晰度参数，默认为最大清晰度  

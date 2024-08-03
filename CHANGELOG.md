@@ -4,6 +4,8 @@
 2. 移除`download`的`rewrite`选项
 3. 修复老视频无法合并的 bug
 4. 更新 [api 文档](./docs/api.md)
+5. 修复配置中`ffmpegBinPath`从来没生效过的的 bug
+6. 添加了`ffpath`和`conc`选项
 
 # 0.5.0
 

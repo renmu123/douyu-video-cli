@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { Command } from "commander";
+import { Command, Option } from "commander";
 import up from "../core/up.js";
 import { downloadVideos, subscribe } from "../core/index.js";
 import { readConfig, writeConfig } from "../core/config.js";
@@ -38,7 +38,9 @@ program
   .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
   .option("-w, --webhook", "使用webhook")
   .option("--url", "webhook地址", "http://127.0.0.1:18010/webhook/custom")
-  .option("-nv, --no-video", "不下载视频")
+  .addOption(new Option("-nv, --no-video", "不下载视频").conflicts("webhook"))
+  .option("-ffpath, --ffmpeg-bin-path <string>", "ffmpeg路径")
+  .option("-conc, --concurrency <number>", "下载并发数", parseFloat, 10)
   .action(
     async (
       url,
@@ -50,11 +52,15 @@ program
         webhook?: boolean;
         url?: string;
         video?: boolean;
+        ffmpegBinPath?: string;
+        concurrency?: number;
       }
     ) => {
       const videoId = parseVideoId(url);
       const config = await readConfig();
       opts.dir = opts.dir ?? config.downloadPath;
+      opts.ffmpegBinPath = opts.ffmpegBinPath ?? config.ffmpegBinPath;
+      opts.concurrency = opts.concurrency || 10;
       const downloader = await downloadVideos(videoId, opts);
     }
   );
@@ -76,7 +82,9 @@ subscribeSubCommand
     "webhook地址",
     "http://127.0.0.1:18010/webhook/custom"
   )
-  .option("-nv, --no-video", "不下载视频")
+  .addOption(new Option("-nv, --no-video", "不下载视频").conflicts("webhook"))
+  .option("-ffpath, --ffmpeg-bin-path <string>", "ffmpeg路径")
+  .option("-conc, --concurrency <number>", "下载并发数", parseFloat, 10)
   .action(
     async (options: {
       force?: boolean;
@@ -86,11 +94,14 @@ subscribeSubCommand
       streamType?: streamType;
       dir?: string;
       video?: boolean;
+      ffmpegBinPath?: string;
+      concurrency?: number;
     }) => {
       // TODO:模板支持
       const config = await readConfig();
       options.dir = options.dir ?? config.downloadPath;
-
+      options.ffmpegBinPath = options.ffmpegBinPath ?? config.ffmpegBinPath;
+      options.concurrency = options.concurrency || 10;
       logger.info(`开始下载订阅，视频将会被保存在${options.dir}文件中`);
       subscribe(options);
     }
@@ -125,7 +136,12 @@ subscribeSubCommand
 subscribeSubCommand
   .command("server")
   .description("定时运行sub命令")
-  .option("-i, --interval <number>", "时间间隔，单位分钟，默认60分钟")
+  .option(
+    "-i, --interval <number>",
+    "时间间隔，单位分钟，默认60分钟",
+    parseFloat,
+    60
+  )
   .option("-d, --danmaku", "下载弹幕")
   .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
   .option("--dir", "下载目录")
@@ -135,7 +151,9 @@ subscribeSubCommand
     "webhook地址",
     "http://127.0.0.1:18010/webhook/custom"
   )
-  .option("-nv, --no-video", "不下载视频")
+  .addOption(new Option("-nv, --no-video", "不下载视频").conflicts("webhook"))
+  .option("-ffpath, --ffmpeg-bin-path <string>", "ffmpeg路径")
+  .option("-conc, --concurrency <number>", "下载并发数", parseFloat, 10)
   .action(
     async (options: {
       interval?: number;
@@ -143,20 +161,20 @@ subscribeSubCommand
       webhook?: boolean;
       url?: string;
       video?: boolean;
+      ffmpegBinPath?: string;
+      concurrency?: number;
     }) => {
       let interval = 60;
+      const config = await readConfig();
+      options.ffmpegBinPath = options.ffmpegBinPath ?? config.ffmpegBinPath;
+      options.concurrency = options.concurrency || 10;
+      options.interval = options.interval || 60;
 
-      if (options.interval) {
-        if (Number.isNaN(Number(options.interval))) {
-          console.error("时间间隔必须是数字");
-          return;
-        } else {
-          interval = Number(options.interval);
-        }
-      }
       subscribe(options);
-      setInterval(() => {
+      setInterval(async () => {
         try {
+          const config = await readConfig();
+          options.ffmpegBinPath = options.ffmpegBinPath || config.ffmpegBinPath;
           subscribe(options);
         } catch (err) {
           logger.error(err.message);
