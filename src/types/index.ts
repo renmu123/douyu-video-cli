@@ -51,4 +51,12 @@ export interface Config {
   logLevel: string;
 }
 
-export type streamType = "1440p60a" | "1080p60" | "high" | "normal";
+export type streamType =
+  | "2160p60a"
+  | "2160p60"
+  | "1440p60a"
+  | "1440p60"
+  | "1080p60"
+  | "super"
+  | "high"
+  | "normal";
