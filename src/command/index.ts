@@ -163,18 +163,21 @@ subscribeSubCommand
       video?: boolean;
       ffmpegBinPath?: string;
       concurrency?: number;
+      dir?: string;
     }) => {
       let interval = 60;
       const config = await readConfig();
       options.ffmpegBinPath = options.ffmpegBinPath ?? config.ffmpegBinPath;
       options.concurrency = options.concurrency || 10;
       options.interval = options.interval || 60;
+      options.dir = options.dir ?? config.downloadPath;
 
       subscribe(options);
       setInterval(async () => {
         try {
           const config = await readConfig();
           options.ffmpegBinPath = options.ffmpegBinPath || config.ffmpegBinPath;
+          options.dir = options.dir ?? config.downloadPath;
           subscribe(options);
         } catch (err) {
           logger.error(err.message);
