@@ -32,7 +32,12 @@ export interface Video {
       start_time: number;
       video_duration: number;
     };
-    liveShow: {};
+    liveShow: {
+      starttime: number;
+      showAuthor: string;
+      dayStr: string;
+      monthStr: string;
+    };
   };
   /** 用于获取视频流 */
   decodeData: string;

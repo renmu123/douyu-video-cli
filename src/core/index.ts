@@ -286,7 +286,7 @@ export async function saveDanmu(vid: string, output: string, video: Video) {
       room_id: video.DATA.content.room_id,
       room_title: room_title,
       live_start_time: new Date(
-        video.DATA.content.start_time * 1000
+        video.DATA.liveShow.starttime * 1000
       ).toISOString(),
       platform: "douyu",
     })
