@@ -40,7 +40,16 @@ export const parseVideoId = (url: string) => {
  * 转换弹幕为b站格式xml
  * @link: https://socialsisteryi.github.io/bilibili-API-collect/docs/danmaku/danmaku_xml.html#%E5%B1%9E%E6%80%A7-p
  */
-export function convert2Xml(data: DanmuItem[]) {
+export function convert2Xml(
+  data: DanmuItem[],
+  metadata?: {
+    user_name?: string;
+    room_id?: string;
+    room_title?: string;
+    live_start_time?: string;
+    platform?: "douyu";
+  }
+) {
   const builder = new XMLBuilder({
     ignoreAttributes: false,
     attributeNamePrefix: "@@",
@@ -118,6 +127,7 @@ export function convert2Xml(data: DanmuItem[]) {
   });
   const xmlContent = builder.build({
     i: {
+      metadata: metadata,
       d: elems,
     },
   });

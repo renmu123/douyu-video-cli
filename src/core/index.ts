@@ -119,7 +119,7 @@ export const downloadVideos = async (
       if (opts.danmaku) {
         const danmuOutput = path.join(downloadDir, `${name}.xml`);
         logger.info(`开始下载弹幕：${danmuOutput}`);
-        await saveDanmu(video.hash_id, danmuOutput);
+        await saveDanmu(video.hash_id, danmuOutput, videoData);
       }
 
       if (opts.webhook && opts.url) {
@@ -165,7 +165,7 @@ export const downloadVideos = async (
         `${sanitizeFileName(videoData.ROOM.name)}.xml`
       );
       logger.info(`开始下载弹幕：${danmuOutput}`);
-      await saveDanmu(videoId, danmuOutput);
+      await saveDanmu(videoId, danmuOutput, videoData);
     }
     if (opts.webhook && opts.url) {
       await axios.post(opts.url, {
@@ -269,13 +269,28 @@ const saveVideo = async (
   progressBar.update(100);
 };
 
-export async function saveDanmu(vid: string, output: string) {
+export async function saveDanmu(vid: string, output: string, video: Video) {
   if (await fs.pathExists(output)) {
     logger.info(`弹幕文件已存在，跳过下载`);
     return;
   }
   const items = await getVideoDanmu(vid);
-  await fs.writeFile(output, convert2Xml(items));
+  let room_title = video.ROOM.name;
+  if (room_title.startsWith("【") && room_title.split("：").length > 1) {
+    room_title = room_title.split("：").slice(1).join("：");
+  }
+  await fs.writeFile(
+    output,
+    convert2Xml(items, {
+      user_name: video.ROOM.author_name,
+      room_id: video.DATA.content.room_id,
+      room_title: room_title,
+      live_start_time: new Date(
+        video.DATA.content.start_time * 1000
+      ).toISOString(),
+      platform: "douyu",
+    })
+  );
   return items;
 }
 
