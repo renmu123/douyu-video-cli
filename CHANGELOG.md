@@ -1,3 +1,7 @@
+# 0.6.4
+
+1. 为弹幕元数据增加 `video_start_time` 参数
+
 # 0.6.3
 
 1. 修复`sub download`无法下载的 bug

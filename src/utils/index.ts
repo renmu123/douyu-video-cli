@@ -47,6 +47,7 @@ export function convert2Xml(
     room_id?: string;
     room_title?: string;
     live_start_time?: string;
+    video_start_time?: string;
     platform?: "douyu";
   }
 ) {
