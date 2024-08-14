@@ -12,8 +12,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0
       axios:
-        specifier: ^1.7.2
-        version: 1.7.2
+        specifier: ^1.7.4
+        version: 1.7.4
       cli-progress:
         specifier: ^3.12.0
         version: 3.12.0
@@ -310,8 +310,8 @@ packages:
     peerDependencies:
       axios: 0.x || 1.x
 
-  axios@1.7.2:
-    resolution: {integrity: sha512-2A8QhOMrbomlDuiLeK9XibIBzuHeRcqqNOHp0Cyp5EoJ1IFDh+XZH3A6BkXtv0K4gFGCI0Y4BM7B1wOEi0Rmgw==}
+  axios@1.7.4:
+    resolution: {integrity: sha512-DukmaFRnY6AzAALSH4J2M3k6PkaC+MfaAGdEERRWcC9q3/TWQwLpHR8ZRLKTdQ3aBDL64EdluRDjJqKw+BPZEw==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -855,8 +855,8 @@ snapshots:
 
   '@renmu/m3u8-downloader@0.3.0':
     dependencies:
-      axios: 1.7.2
-      axios-retry: 4.5.0(axios@1.7.2)
+      axios: 1.7.4
+      axios-retry: 4.5.0(axios@1.7.4)
       fs-extra: 11.2.0
       m3u8-parser: 7.1.0
       p-queue: 8.0.1
@@ -1004,12 +1004,12 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios-retry@4.5.0(axios@1.7.2):
+  axios-retry@4.5.0(axios@1.7.4):
     dependencies:
-      axios: 1.7.2
+      axios: 1.7.4
       is-retry-allowed: 2.2.0
 
-  axios@1.7.2:
+  axios@1.7.4:
     dependencies:
       follow-redirects: 1.15.6
       form-data: 4.0.0
