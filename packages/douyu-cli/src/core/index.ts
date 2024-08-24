@@ -1,23 +1,23 @@
 import path from "node:path";
-import os from "node:os";
 import fs from "fs-extra";
 import { SingleBar } from "cli-progress";
 import axios from "axios";
 import M3U8Downloader from "@renmu/m3u8-downloader";
 
-import { sanitizeFileName, convert2Xml } from "../utils/index.js";
+import { sanitizeFileName } from "../utils/index.js";
 import {
   getVideoDanmu,
   getStreamUrls,
   getVideos,
   parseVideo,
   getReplayList,
-} from "./api.js";
+  convert2Xml,
+} from "douyu-api";
 import up from "./up.js";
 import { readData, pushData, deleteData, readConfig } from "./config.js";
 import logger from "../utils/log.js";
 
-import type { Video, streamType } from "../types/index.js";
+import type { Video, streamType } from "douyu-api";
 
 interface DownloadOptions {
   danmaku?: boolean;
@@ -89,7 +89,7 @@ export const downloadVideos = async (
   }
 ) => {
   const videoData = await parseVideo(buildVideoUrl(videoId));
-  const downloadDir = opts.dir;
+  const downloadDir = opts.dir!;
 
   if (opts.all) {
     const res = await getVideos(videoId, videoData.ROOM.up_id);
@@ -311,7 +311,7 @@ export const downloadHLS = (
     const downloader = new M3U8Downloader(url, filePath, {
       ...options,
       mergeSegments: true,
-      convert2Mp4: !!options.ffmpegPath,
+      convert2Mp4: !!options?.ffmpegPath,
       clean: false,
     });
     downloader.on("progress", data => {

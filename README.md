@@ -138,7 +138,7 @@ curl --location 'http://127.0.0.1:18010/webhook/custom' \
 
 node>=20
 
-如果你需要使用一些相关 api 进行二次开发，参考 [api 文档](./docs/api.md)
+如果你需要使用一些相关 api 进行二次开发，参考 [doyu-api](./packages/douyu-api/README.md)
 
 ## Install
 

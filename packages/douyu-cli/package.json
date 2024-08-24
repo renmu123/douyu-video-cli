@@ -1,0 +1,59 @@
+{
+  "name": "douyu-cli",
+  "version": "1.0.0",
+  "description": "斗鱼视频下载CLI",
+  "homepage": "https://github.com/renmu123/douyu-video-cli",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "dev": "tsc -w",
+    "build": "rimraf dist && tsc",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "release": "pnpm run build && pnpm publish --access=public",
+    "build:win": "rollup --config rollup-build-exe.config.js && node -v && node --experimental-sea-config sea-config.json && node -e \"require('fs').copyFileSync(process.execPath, 'douyu.exe')\" && npx postject douyu.exe NODE_SEA_BLOB sea-prep.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2 "
+  },
+  "keywords": [
+    "douyu",
+    "download",
+    "cli",
+    "video",
+    "斗鱼",
+    "视频",
+    "下载",
+    "直播",
+    "live"
+  ],
+  "author": "renmu123",
+  "license": "GPLv3",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "douyu": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "douyu-api": "workspace:*",
+    "@renmu/m3u8-downloader": "^0.3.0",
+    "axios": "^1.7.4",
+    "cli-progress": "^3.12.0",
+    "commander": "^12.1.0",
+    "fs-extra": "^11.2.0",
+    "winston": "^3.13.1"
+  },
+  "devDependencies": {
+    "@kineticcafe/rollup-plugin-delete": "3.0.0",
+    "@rollup/plugin-commonjs": "^26.0.0",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/cli-progress": "^3.11.6",
+    "@types/fs-extra": "^11.0.4",
+    "rollup": "^4.19.0"
+  }
+}

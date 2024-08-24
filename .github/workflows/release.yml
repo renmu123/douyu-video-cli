@@ -49,7 +49,7 @@ jobs:
         run: pnpm install
 
       - name: build
-        run: pnpm run build:win
+        run: pnpm run --filter douyu-cli build:win
 
       - name: release
         if: env.is_tag == 'true'
@@ -59,7 +59,7 @@ jobs:
           draft: false
           token: ${{ secrets.GITHUB_TOKEN }}
           artifactErrorsFailBuild: false
-          artifacts: "*.exe"
+          artifacts: "**/*.exe"
           replacesArtifacts: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -70,7 +70,7 @@ jobs:
         with:
           name: Windows
           path: |
-            *.exe
+            **/*.exe
 
 permissions:
   contents: write

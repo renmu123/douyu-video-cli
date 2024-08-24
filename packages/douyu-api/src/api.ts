@@ -2,9 +2,9 @@ import axios from "axios";
 import CryptoJS from "crypto-js";
 // @ts-ignore
 import safeEval from "safe-eval";
-import { parseScript, parseFunctionName } from "../utils/index.js";
+import { parseScript, parseFunctionName } from "./utils.js";
 
-import type { Video, streamType, DanmuItem } from "../types/index.js";
+import type { Video, streamType, DanmuItem } from "./types.js";
 
 // @ts-ignore
 global.CryptoJS = CryptoJS;
@@ -12,7 +12,11 @@ global.CryptoJS = CryptoJS;
 /**
  * 获取原始视频弹幕
  */
-async function getDanmu(vid: string, startTime: number, endTime: number = -1) {
+export async function getDanmu(
+  vid: string,
+  startTime: number,
+  endTime: number = -1
+) {
   const url = "https://v.douyu.com/wgapi/vod/center/getBarrageList";
   const res = await axios.get(url, {
     params: {
@@ -44,7 +48,7 @@ export async function getVideoDanmu(vid: string) {
  * 获取视频point_id
  *  @param videoId 视频id
  */
-async function requestPointId(videoId: string) {
+export async function requestPointId(videoId: string) {
   const response = await axios.get(`https://v.douyu.com/show/${videoId}`);
 
   const reg = new RegExp(`{"vid":"${videoId}","point_id":(\\d+)`);
@@ -122,6 +126,7 @@ export async function getVideos(
 const decode = (response: any, data: any) => {
   const scripts = parseScript(response.data);
   const decodeScript = scripts.at(-2);
+  // @ts-ignore
   const decodeFuction = parseFunctionName(decodeScript)[0];
   const pointId = data.ROOM.point_id;
   // 第二个参数: 从cookie中获取，试试看使用固定值
@@ -218,6 +223,13 @@ export async function getRoomInfo(roomId: number): Promise<{
   room: {
     up_id: string;
     nickname: string;
+    avatar: {
+      room_name: string;
+      big: string;
+      middle: string;
+      small: string;
+      room_pic: string;
+    };
   };
 }> {
   const response = await axios.get(`https://www.douyu.com/betard/${roomId}`);

@@ -1,5 +1,5 @@
 import { readConfig, writeConfig } from "./config.js";
-import { getRoomInfo, getFishBarId } from "./api.js";
+import { getRoomInfo, getFishBarId } from "douyu-api";
 
 const subscribe = async (roomId: number) => {
   const config = await readConfig();

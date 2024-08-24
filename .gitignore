@@ -7,6 +7,7 @@ node_modules
 
 # build
 *.js.map
+tsconfig.tsbuildinfo
 
 dist
 *.code-workspace

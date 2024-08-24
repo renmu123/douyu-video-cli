@@ -1,23 +1,7 @@
 {
-  "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "baseUrl": ".",
-    "inlineSourceMap": false,
-    "module": "nodenext",
-    "target": "es2022",
-    "downlevelIteration": true,
-    "allowJs": false,
-    "noImplicitAny": true,
-    "moduleResolution": "Node16",
-    "importHelpers": true,
-    "lib": ["es5", "scripthost", "es2015", "es2020", "ESNext"],
-    "allowSyntheticDefaultImports": true,
-    "emitDecoratorMetadata": false,
-    "experimentalDecorators": true,
-    "declaration": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true
-  },
-  "include": ["src/**/*.ts", "src/**/*"]
+  "files": [],
+  "references": [
+    { "path": "./packages/douyu-api" },
+    { "path": "./packages/douyu-cli" }
+  ]
 }

@@ -3,13 +3,13 @@
 ## 安装
 
 ```bash
-npm i douyu-cli
+npm i douyu-api
 ```
 
 ## 使用
 
 ```ts
-import { getVideoDanmu, getStreamUrls, getVideos, parseVideo } from "douyu-cli";
+import { getVideoDanmu, getStreamUrls, getVideos, parseVideo } from "douyu-api";
 ```
 
 ## 函数列表
