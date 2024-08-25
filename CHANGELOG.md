@@ -1,6 +1,7 @@
-# 0.6.4
+# 1.0.0
 
-1. 为弹幕元数据增加 `video_start_time` 参数
+1. api 相关导出移动到`douyu-api`包中
+2. 为弹幕元数据增加 `video_start_time` 参数
 
 # 0.6.3
 

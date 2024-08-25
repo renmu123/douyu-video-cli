@@ -15,7 +15,7 @@ import { streamType } from "douyu-api";
 
 export const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "../../package.json"), "utf-8")
+  fs.readFileSync(path.join(__dirname, "../package.json"), "utf-8")
 );
 
 declare global {

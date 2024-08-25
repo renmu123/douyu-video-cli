@@ -1,13 +1,11 @@
+import crypto from "node:crypto";
+
 import axios from "axios";
-import CryptoJS from "crypto-js";
 // @ts-ignore
 import safeEval from "safe-eval";
 import { parseScript, parseFunctionName } from "./utils.js";
 
 import type { Video, streamType, DanmuItem } from "./types.js";
-
-// @ts-ignore
-global.CryptoJS = CryptoJS;
 
 /**
  * 获取原始视频弹幕
@@ -137,7 +135,11 @@ const decode = (response: any, data: any) => {
   const p = safeEval(
     `(function func(){${decodeScript};return ${decodeFuction}(${pointId}, "${did}", ${s})})()`,
     {
-      CryptoJS: CryptoJS,
+      CryptoJS: {
+        MD5: (str: string) => {
+          return crypto.createHash("md5").update(str).digest("hex");
+        },
+      },
     }
   );
   // 最终参数
