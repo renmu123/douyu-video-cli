@@ -9,10 +9,11 @@ npm i douyu-api
 ## 使用
 
 ```ts
-import { getVideoDanmu, getStreamUrls, getVideos, parseVideo } from "douyu-api";
+import { video } from "douyu-api";
+video.parseVideo(url);
 ```
 
-## 函数列表
+## `video`函数列表（斗鱼视频相关）
 
 ### `getDanmu`
 
@@ -92,18 +93,6 @@ import { getVideoDanmu, getStreamUrls, getVideos, parseVideo } from "douyu-api";
 
 - `Promise<object>`: 回放视频列表数据
 
-### `getRoomInfo`
-
-获取直播间信息。
-
-**参数:**
-
-- `roomId` (number): 直播间 ID
-
-**返回:**
-
-- `Promise<object>`: 直播间信息
-
 ### `getFishBarId`
 
 获取鱼吧 ID。
@@ -131,3 +120,25 @@ import { getVideoDanmu, getStreamUrls, getVideos, parseVideo } from "douyu-api";
 **返回:**
 
 - `Promise<object>`: 鱼吧视频列表数据
+
+## `live`相关函数（直播相关）
+
+### `getRoomInfo`
+
+获取直播间信息。
+
+**参数:**
+
+- `roomId` (number): 直播间 ID
+
+**返回:**
+
+- `Promise<object>`: 直播间信息
+
+### `getLiveInfo`
+
+对斗鱼 getH5Play 接口的封装，用于获取获取直播流
+
+**参数:**
+
+- `roomId` (number): 直播间 ID

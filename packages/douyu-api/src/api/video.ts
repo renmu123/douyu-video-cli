@@ -3,9 +3,9 @@ import crypto from "node:crypto";
 import axios from "axios";
 // @ts-ignore
 import safeEval from "safe-eval";
-import { parseScript, parseFunctionName } from "./utils.js";
+import { parseScript, parseFunctionName } from "../utils.js";
 
-import type { Video, streamType, DanmuItem } from "./types.js";
+import type { Video, streamType, DanmuItem } from "../types.js";
 
 /**
  * 获取原始视频弹幕
@@ -121,37 +121,37 @@ export async function getVideos(
   return response.data.data;
 }
 
-const decode = (response: any, data: any) => {
-  const scripts = parseScript(response.data);
-  const decodeScript = scripts.at(-2);
-  // @ts-ignore
-  const decodeFuction = parseFunctionName(decodeScript)[0];
-  const pointId = data.ROOM.point_id;
-  // 第二个参数: 从cookie中获取，试试看使用固定值
-  const did = "d6122a55e9f2d9ff39d9092800001701";
-  // 第三个参数: 时间戳 parseInt((new Date).getTime() / 1e3, 10)
-  const s = Math.floor(new Date().getTime() / 1e3);
-  // 加密后的字符串参数
-  const p = safeEval(
-    `(function func(){${decodeScript};return ${decodeFuction}(${pointId}, "${did}", ${s})})()`,
-    {
-      CryptoJS: {
-        MD5: (str: string) => {
-          return crypto.createHash("md5").update(str).digest("hex");
-        },
-      },
-    }
-  );
-  // 最终参数
-  const t = `${p}&vid=${data.ROOM.vid}`;
-
-  return t;
-};
-
 /**
  * 解析视频页
  */
 export async function parseVideo(url: string): Promise<Video> {
+  const decode = (response: any, data: any) => {
+    const scripts = parseScript(response.data);
+    const decodeScript = scripts.at(-2);
+    // @ts-ignore
+    const decodeFuction = parseFunctionName(decodeScript)[0];
+    const pointId = data.ROOM.point_id;
+    // 第二个参数: 从cookie中获取，试试看使用固定值
+    const did = "d6122a55e9f2d9ff39d9092800001701";
+    // 第三个参数: 时间戳 parseInt((new Date).getTime() / 1e3, 10)
+    const s = Math.floor(new Date().getTime() / 1e3);
+    // 加密后的字符串参数
+    const p = safeEval(
+      `(function func(){${decodeScript};return ${decodeFuction}(${pointId}, "${did}", ${s})})()`,
+      {
+        CryptoJS: {
+          MD5: (str: string) => {
+            return crypto.createHash("md5").update(str).digest("hex");
+          },
+        },
+      }
+    );
+    // 最终参数
+    const t = `${p}&vid=${data.ROOM.vid}`;
+
+    return t;
+  };
+
   const response = await axios.get(url);
   const regex = /window\.\$DATA\s*=\s*({.*?});/s;
   // Match the regular expression in the HTML
@@ -216,27 +216,6 @@ export async function getReplayList(params: {
   );
 
   return response.data.data;
-}
-
-/**
- * 获取直播间
- */
-export async function getRoomInfo(roomId: number): Promise<{
-  room: {
-    up_id: string;
-    nickname: string;
-    avatar: {
-      room_name: string;
-      big: string;
-      middle: string;
-      small: string;
-      room_pic: string;
-    };
-  };
-}> {
-  const response = await axios.get(`https://www.douyu.com/betard/${roomId}`);
-
-  return response.data;
 }
 
 /**
