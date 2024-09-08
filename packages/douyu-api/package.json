@@ -1,7 +1,7 @@
 {
   "name": "douyu-api",
-  "version": "0.1.0",
-  "homepage": "https://github.com/renmu123/douyu-video-cli",
+  "version": "0.2.0",
+  "homepage": "https://github.com/renmu123/douyu-video-cli/tree/main/packages/douyu-api",
   "description": "douyu api",
   "type": "module",
   "main": "./dist/index.js",
