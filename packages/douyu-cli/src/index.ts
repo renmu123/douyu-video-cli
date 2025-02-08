@@ -35,7 +35,7 @@ program
   .description("下载视频")
   .option("-a, --all", "下载所有分p")
   .option("-d, --danmaku", "下载弹幕")
-  .option("--dir", "下载目录")
+  .option("--dir <string>", "下载目录")
   .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
   .option("-w, --webhook", "使用webhook")
   .option("--url", "webhook地址", "http://127.0.0.1:18010/webhook/custom")
@@ -76,7 +76,7 @@ subscribeSubCommand
   .description("下载订阅")
   .option("-d, --danmaku", "下载弹幕")
   .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
-  .option("--dir", "下载目录")
+  .option("--dir <string>", "下载目录")
   .option("-w, --webhook", "使用webhook")
   .option(
     "--url <string>",
@@ -145,7 +145,7 @@ subscribeSubCommand
   )
   .option("-d, --danmaku", "下载弹幕")
   .option("-st, --stream-type <string>", "清晰度，默认为最高清晰度")
-  .option("--dir", "下载目录")
+  .option("--dir <string>", "下载目录")
   .option("-w, --webhook", "使用webhook")
   .option(
     "--url <string>",
