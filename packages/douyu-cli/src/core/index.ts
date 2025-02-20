@@ -5,14 +5,7 @@ import axios from "axios";
 import M3U8Downloader from "@renmu/m3u8-downloader";
 
 import { sanitizeFileName } from "../utils/index.js";
-import {
-  getVideoDanmu,
-  getStreamUrls,
-  getVideos,
-  parseVideo,
-  getReplayList,
-  convert2Xml,
-} from "douyu-api";
+import { video as videoApi, convert2Xml } from "douyu-api";
 import up from "./up.js";
 import { readData, pushData, deleteData, readConfig } from "./config.js";
 import logger from "../utils/log.js";
@@ -39,14 +32,14 @@ export const subscribe = async (options: DownloadOptions) => {
 
   let videoIds: string[] = [];
   for (const up of upList) {
-    const replayList = await getReplayList({
+    const replayList = await videoApi.getReplayList({
       up_id: up.upId,
       page: 1,
       limit: 1,
     });
     for (const replay of replayList.list) {
       for (const video of replay.video_list) {
-        const videos = await getVideos(video.hash_id, up.upId);
+        const videos = await videoApi.getVideos(video.hash_id, up.upId);
         videoIds.push(...videos.list.map(item => item.hash_id));
       }
     }
@@ -88,13 +81,13 @@ export const downloadVideos = async (
     danmaku: false,
   }
 ) => {
-  const videoData = await parseVideo(buildVideoUrl(videoId));
+  const videoData = await videoApi.parseVideo(buildVideoUrl(videoId));
   const downloadDir = opts.dir!;
 
   if (opts.all) {
-    const res = await getVideos(videoId, videoData.ROOM.up_id);
+    const res = await videoApi.getVideos(videoId, videoData.ROOM.up_id);
     for (const video of res.list) {
-      const videoData = await parseVideo(buildVideoUrl(video.hash_id));
+      const videoData = await videoApi.parseVideo(buildVideoUrl(video.hash_id));
       const name = sanitizeFileName(video.title);
       const output = path.join(downloadDir, `${name}.mp4`);
       // console.log(JSON.stringify(videoData, null, 2));
@@ -205,7 +198,7 @@ export const downloadVideo = async (
  * 获取最高清晰度的视频流
  */
 const getStream = async (data: string, streamType?: streamType) => {
-  const res = await getStreamUrls(data);
+  const res = await videoApi.getStreamUrls(data);
   const streams = Object.values(res.thumb_video);
   if (streams.length === 0) {
     throw new Error("没有找到视频流");
@@ -274,7 +267,7 @@ export async function saveDanmu(vid: string, output: string, video: Video) {
     logger.info(`弹幕文件已存在，跳过下载`);
     return;
   }
-  const items = await getVideoDanmu(vid);
+  const items = await videoApi.getVideoDanmu(vid);
   let room_title = video.ROOM.name;
   if (room_title.startsWith("【") && room_title.split("：").length > 1) {
     room_title = room_title.split("：").slice(1).join("：");

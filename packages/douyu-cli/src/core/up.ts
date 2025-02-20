@@ -1,5 +1,5 @@
 import { readConfig, writeConfig } from "./config.js";
-import { getRoomInfo, getFishBarId } from "douyu-api";
+import { live, video } from "douyu-api";
 
 const subscribe = async (roomId: number) => {
   const config = await readConfig();
@@ -8,10 +8,10 @@ const subscribe = async (roomId: number) => {
   if (upList.find(item => item.roomId === roomId)) {
     throw new Error("已经订阅过了");
   }
-  const room = await getRoomInfo(roomId);
+  const room = await live.getRoomInfo(roomId);
   if (!room.room) throw new Error("请确认房间号是否正确");
 
-  const fishBarId = await getFishBarId(roomId);
+  const fishBarId = await video.getFishBarId(roomId);
 
   const item = {
     roomId: roomId,
