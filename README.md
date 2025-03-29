@@ -3,6 +3,8 @@
 用于下载斗鱼视频录播以及弹幕，支持订阅，自动下载，支持调用 [biliLive-tools](https://github.com/renmu123/biliLive-tools) 自动上传，如果有不兼容请查看[更新历史](https://github.com/renmu123/douyu-video-cli/blob/main/CHANGELOG.md)。  
 [视频简介](https://www.bilibili.com/video/BV1tJ4m1a7GQ/)
 
+如果你想使用GUI,可以尝试  [biliLive-tools](https://github.com/renmu123/biliLive-tools) 项目
+
 **node>=20**
 
 # 安装
