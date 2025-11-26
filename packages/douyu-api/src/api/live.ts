@@ -163,3 +163,33 @@ async function getSignFn(
 
   return sign;
 }
+
+export async function parseRoomId(url: string): Promise<string | null> {
+  if (!/https?:\/\/(?:.*?\.)?douyu.com\//.test(url)) return null;
+
+  url = url.trim();
+  // 从 URL 参数中获取 rid
+  const rid = new URL(url).searchParams.get("rid");
+  if (rid) {
+    return rid;
+  }
+
+  const res = await requester.get(url);
+  const html = res.data;
+  // 从页面脚本中提取 room_id
+  const matched = html.match(/\$ROOM\.room_id.?=(.*?);/);
+  if (matched) {
+    const roomId = matched[1].trim();
+    return roomId ? roomId : null;
+  }
+
+  // 从 canonical link 中提取 roomId
+  const canonicalLink = html.match(/<link rel="canonical" href="(.*?)"/);
+  if (canonicalLink) {
+    const canonicalUrl = canonicalLink[1];
+    const roomId = canonicalUrl.split("/").pop();
+    return roomId ? roomId : null;
+  }
+
+  return null;
+}

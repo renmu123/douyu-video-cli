@@ -123,6 +123,10 @@ video.parseVideo(url);
 
 ## `live`相关函数（直播相关）
 
+### `parseRoomId`
+
+通过一个链接尝试解析出斗鱼的直播间号
+
 ### `getRoomInfo`
 
 获取直播间信息。
