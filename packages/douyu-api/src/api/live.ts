@@ -176,6 +176,12 @@ export async function parseRoomId(url: string): Promise<string | null> {
 
   const res = await requester.get(url);
   const html = res.data;
+
+  const matchedRoomId = html.match(/\\"room_id\\":\s*(\d+)/)?.[1];
+  if (matchedRoomId) {
+    return matchedRoomId;
+  }
+
   // 从页面脚本中提取 room_id
   const matched = html.match(/\$ROOM\.room_id.?=(.*?);/);
   if (matched) {
