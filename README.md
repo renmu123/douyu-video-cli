@@ -3,7 +3,7 @@
 用于下载斗鱼视频录播以及弹幕，支持订阅，自动下载，支持调用 [biliLive-tools](https://github.com/renmu123/biliLive-tools) 自动上传，如果有不兼容请查看[更新历史](https://github.com/renmu123/douyu-video-cli/blob/main/CHANGELOG.md)。  
 [视频简介](https://www.bilibili.com/video/BV1tJ4m1a7GQ/)
 
-如果你想使用GUI,可以尝试  [biliLive-tools](https://github.com/renmu123/biliLive-tools) 项目
+如果你想使用 GUI,可以尝试 [biliLive-tools](https://github.com/renmu123/biliLive-tools) 项目
 
 **node>=20**
 
@@ -54,6 +54,8 @@ Options:
   -nv, --no-video                      不下载视频
   -ffpath, --ffmpeg-bin-path <string>  ffmpeg路径
   -conc, --concurrency <number>        下载并发数 (default: 10)
+  -si, --start-index <number>          开始切片数
+  -ei, --end-index <number>            结束切片数
   -h, --help                           display help for command
 ```
 
@@ -140,7 +142,7 @@ curl --location 'http://127.0.0.1:18010/webhook/custom' \
 
 node>=20
 
-如果你需要使用一些相关 api 进行二次开发，参考 [doyu-api](./packages/douyu-api/README.md)
+如果你需要使用一些相关 api 进行二次开发，参考 [douyu-api](./packages/douyu-api/README.md)
 
 ## Install
 

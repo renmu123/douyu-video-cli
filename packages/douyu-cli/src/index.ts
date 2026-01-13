@@ -42,6 +42,10 @@ program
   .addOption(new Option("-nv, --no-video", "不下载视频").conflicts("webhook"))
   .option("-ffpath, --ffmpeg-bin-path <string>", "ffmpeg路径")
   .option("-conc, --concurrency <number>", "下载并发数", parseFloat, 10)
+  .option("--start-index <number>", "开始下载的分片索引", parseFloat)
+  .option("--end-index <number>", "结束下载的分片索引", parseFloat)
+  .option("--start-time <number>", "开始下载的起始时间(秒)", parseFloat)
+  .option("--end-time <number>", "结束下载的时间(秒)", parseFloat)
   .action(
     async (
       url,
@@ -55,6 +59,10 @@ program
         video?: boolean;
         ffmpegBinPath?: string;
         concurrency?: number;
+        startIndex?: number;
+        endIndex?: number;
+        startTime?: number;
+        endTime?: number;
       }
     ) => {
       const videoId = parseVideoId(url);

@@ -2,6 +2,7 @@
 
 1. api 相关导出移动到`douyu-api`包中
 2. 为弹幕元数据增加 `video_start_time` 参数
+3. 支持 `start-time`、`end-time`、`start-index`、`end-index` 参数 [#3](https://github.com/renmu123/douyu-video-cli/issues/3)
 
 # 0.6.3
 

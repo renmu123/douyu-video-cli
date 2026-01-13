@@ -36,8 +36,8 @@ importers:
   packages/douyu-cli:
     dependencies:
       '@renmu/m3u8-downloader':
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.5.0
+        version: 0.5.0
       axios:
         specifier: ^1.7.4
         version: 1.7.5
@@ -124,8 +124,8 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
-  '@renmu/m3u8-downloader@0.3.0':
-    resolution: {integrity: sha512-otymJB03zwONmmR6QhK31pSiHcg93YIXnb4h9IAW91yuHfv7XSOb4MTF869dpeuRDuJenocpALgeCup2Qe1PLQ==}
+  '@renmu/m3u8-downloader@0.5.0':
+    resolution: {integrity: sha512-tqcW35YEvdlw/B8ngNuCNGH+G9ITeIN7KB3bY6p5/gx3+g8DL4comFuC1LqNwRI5JSMQQFTDaOipPSLcbh6dtQ==}
     engines: {node: '>=18'}
 
   '@rollup/plugin-commonjs@26.0.1':
@@ -849,7 +849,7 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@renmu/m3u8-downloader@0.3.0':
+  '@renmu/m3u8-downloader@0.5.0':
     dependencies:
       axios: 1.7.5
       axios-retry: 4.5.0(axios@1.7.5)
